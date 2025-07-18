@@ -47,6 +47,11 @@ const reportSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+    status: {
+      type: String,
+      enum: ['entered', 'started', 'finished', 'sent', 'cancelled'],
+      default: 'entered'
+    },
     patient: {
       type: patientSchema,
       required: true
@@ -62,7 +67,7 @@ const reportSchema = new mongoose.Schema(
     },
     studyType: {
       type: String,
-      enum: ['citología', 'histopatología', 'inmunohistoquímica'],
+      enum: ['cito', 'hp', 'ihq'],
       required: true
     },
     macroDescription: {

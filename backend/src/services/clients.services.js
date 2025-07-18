@@ -10,8 +10,7 @@ export async function createClient(data) {
     if (existingClient.name === data.name) CustomError.new(dictionary.clientExists);
     if (existingClient.email === data.email) CustomError.new(dictionary.emailExists);
   };
-  const newClient = new ClientModel(data);
-  return await newClient.save();
+  return await ClientModel.create(data);
 }
 
 export async function getAllClients() {
