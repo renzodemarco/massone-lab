@@ -2,7 +2,8 @@ import Joi from 'joi';
 
 export const createReportSchema = Joi.object({
   protocolNumber: Joi.string().trim().required(),
-
+  status: Joi.string().valid('entered', 'started', 'finished', 'sent', 'cancelled').optional(),
+  
   patient: Joi.object({
     owner: Joi.string().trim().optional().allow(''),
     name: Joi.string().trim().optional().allow(''),
