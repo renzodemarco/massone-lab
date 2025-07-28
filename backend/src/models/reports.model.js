@@ -70,6 +70,10 @@ const reportSchema = new mongoose.Schema(
       enum: ['cito', 'hp', 'ihq'],
       required: true
     },
+    sampleInfo: {
+      type: String,
+      trim: true
+    },
     macroDescription: {
       type: String,
       trim: true

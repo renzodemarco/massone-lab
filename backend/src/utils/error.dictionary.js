@@ -7,6 +7,10 @@ export const dictionary = {
     status: 409,
     message: "Email already exists"
   },
+  clientNotFound: {
+    status: 404,
+    message: "Client not found"
+  },
   authentication: {
     status: 401,
     message: "Not authenticated"
