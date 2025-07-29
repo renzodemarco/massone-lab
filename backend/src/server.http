@@ -1,0 +1,27 @@
+### POST CLIENT
+POST http://localhost:8080/api/clients/
+Content-Type: application/json
+
+{
+  "name": "Client Test",
+  "email": "test@example.com",
+  "address": "Fake Street 123",
+  "phone": "123456789",
+  "veterinarians": ["Dr. House", "Dra. Wilson"]
+}
+
+### GET CLIENTS
+
+GET http://localhost:8080/api/clients/
+
+### PUT CLIENT
+PUT http://localhost:8080/api/clients/6887e6099456012b51943dc2
+Content-Type: application/json
+
+{
+  "name": "New Client Name"
+}
+
+### DELETE CLIENT
+
+DELETE http://localhost:8080/api/clients/6887e6099456012b51943dc2

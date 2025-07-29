@@ -3,13 +3,13 @@ import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
 
 export async function createClient(data) {
-  const existingClient = await ClientsModel.findOne({
-    $or: [{ name: data.name }, { email: data.email }]
+  const existing = await ClientsModel.findOne({
+    $or: [
+      { name: { $regex: `^${data.name}$`, $options: 'i' } },
+      { email: data.email }
+    ]
   }).lean();
-  if (existingClient) {
-    if (existingClient.name === data.name) CustomError.new(dictionary.clientExists);
-    if (existingClient.email === data.email) CustomError.new(dictionary.emailExists);
-  };
+  if (existing) CustomError.new(dictionary.clientAlreadyExists);
   return await ClientsModel.create(data);
 }
 
@@ -30,6 +30,16 @@ export async function getClientsByName(name) {
 }
 
 export async function updateClient(id, data) {
+  if (data.name || data.email) {
+    const existing = await ClientsModel.findOne({
+      _id: { $ne: id },
+      $or: [
+        data.name ? { name: { $regex: `^${data.name}$`, $options: 'i' } } : null,
+        data.email ? { email: data.email } : null
+      ].filter(Boolean)
+    }).lean();
+    if (existing) CustomError.new(dictionary.clientAlreadyExists);
+  }
   const client = await ClientsModel.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true

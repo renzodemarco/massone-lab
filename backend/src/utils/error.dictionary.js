@@ -1,11 +1,7 @@
 export const dictionary = {
-  clientExists: {
+  clientAlreadyExists: {
     status: 409,
-    message: "Client name already exists"
-  },
-  emailExists: {
-    status: 409,
-    message: "Email already exists"
+    message: "Client name or email already exists"
   },
   clientNotFound: {
     status: 404,
@@ -17,7 +13,7 @@ export const dictionary = {
   },
   authorization: {
     status: 403,
-    message: "No authorizated"
+    message: "Not authorized"
   }
 }
 
