@@ -3,7 +3,7 @@ import Joi from 'joi';
 export const createReportSchema = Joi.object({
   protocolNumber: Joi.string().trim().required(),
   status: Joi.string().valid('entered', 'started', 'finished', 'sent', 'cancelled').optional(),
-  
+
   patient: Joi.object({
     owner: Joi.string().trim().optional().allow(''),
     name: Joi.string().trim().optional().allow(''),
@@ -17,11 +17,15 @@ export const createReportSchema = Joi.object({
 
   veterinarian: Joi.string().trim().optional().allow(''),
 
-  client: Joi.string().required(),
+  client: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
 
   studyType: Joi.string()
-    .valid('citología', 'histopatología', 'inmunohistoquímica')
+    .valid('cito', 'hp', 'ihq')
     .required(),
+
+  sampleInfo: Joi.string().trim().optional().allow(''),
 
   macroDescription: Joi.string().trim().optional().allow(''),
   microDescription: Joi.string().trim().optional().allow(''),
@@ -32,3 +36,4 @@ export const createReportSchema = Joi.object({
 
   entryDate: Joi.date().optional()
 });
+

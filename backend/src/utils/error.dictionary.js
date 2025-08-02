@@ -7,6 +7,10 @@ export const dictionary = {
     status: 404,
     message: "Client not found"
   },
+  protocolNumberExists: {
+    status: 409,
+    message: "Protocol number already exists"
+  },
   authentication: {
     status: 401,
     message: "Not authenticated"

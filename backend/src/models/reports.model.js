@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { mongoosePaginate } from "mongoose-paginate-v2";
 
 const patientSchema = new mongoose.Schema(
   {
@@ -105,6 +106,8 @@ const reportSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+reportSchema.plugin(mongoosePaginate);
 
 const ReportModel = mongoose.model('Report', reportSchema);
 
