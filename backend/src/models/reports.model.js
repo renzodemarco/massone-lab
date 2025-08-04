@@ -100,12 +100,28 @@ const reportSchema = new mongoose.Schema(
     entryDate: {
       type: Date,
       default: Date.now
+    },
+    dueDate: {
+      type: Date
     }
   },
   {
     timestamps: true
   }
 );
+
+reportSchema.pre('save', function (next) {
+  if (!this.dueDate && this.entryDate && this.studyType) {
+    const daysToAdd = {
+      cito: 3,
+      hp: 7,
+      ihq: 10
+    }[this.studyType] || 7;
+
+    this.dueDate = new Date(this.entryDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  }
+  next();
+});
 
 reportSchema.plugin(mongoosePaginate);
 
