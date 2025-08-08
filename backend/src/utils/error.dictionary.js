@@ -7,6 +7,10 @@ export const dictionary = {
     status: 404,
     message: "Client not found"
   },
+  reportNotFound: {
+    status: 404,
+    message: "Report not found"
+  },
   protocolNumberExists: {
     status: 409,
     message: "Protocol number already exists"

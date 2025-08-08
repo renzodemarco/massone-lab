@@ -4,5 +4,5 @@ export default function (error, req, res, next) {
     const path = req.method + " " + req.url;
 
     console.error({ status, message, path })
-    return res.status(status).json({ status, message, path });
+    return res.status(status).json({ status, message, path, success: false });
 }
