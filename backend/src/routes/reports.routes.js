@@ -6,6 +6,7 @@ const router = Router();
 router.post("/", reportsControllers.POSTReport)
 .get("/", reportsControllers.GETReports)
 .get("/:id", reportsControllers.GETReportById)
-.put("/:id", reportsControllers.PUTReport);
+.put("/:id", reportsControllers.PUTReport)
+.delete("/:id", reportsControllers.DELETEReport);
 
 export default router;

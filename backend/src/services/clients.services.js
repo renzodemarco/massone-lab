@@ -48,7 +48,7 @@ export async function updateClient(id, data) {
   return client;
 }
 
-export async function deleteClientById(id) {
+export async function deleteClient(id) {
   const client = await ClientsModel.findByIdAndDelete(id);
   if (!client) CustomError.new(dictionary.clientNotFound);
   return client;

@@ -39,7 +39,7 @@ export async function PUTClient(req, res, next) {
 export async function DELETEClient(req, res, next) {
   try {
     const { id } = req.params;
-    const client = await clientsServices.deleteClientById(id);
+    const client = await clientsServices.deleteClient(id);
     res.status(200).json({ success: true, payload: client });
   }
   catch (e) {

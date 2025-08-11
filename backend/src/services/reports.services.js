@@ -28,3 +28,9 @@ export async function updateReport(id, data) {
   if (!report) CustomError.new(dictionary.reportNotFound);
   return report;
 }
+
+export async function deleteReport(id) {
+  const report = await ReportsModel.findById(id)
+  if (!report) CustomError.new(dictionary.reportNotFound);
+  return report;
+}
