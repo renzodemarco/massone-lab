@@ -15,7 +15,7 @@ export async function getReports(filters) {
 }
 
 export async function getReportById(id) {
-  const report = await ReportsModel.findById(id);
+  const report = await ReportsModel.findById(id).populate("client", "name email");
   if (!report) CustomError.new(dictionary.reportNotFound);
   return report;
 }

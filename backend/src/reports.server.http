@@ -28,6 +28,7 @@ PUT http://localhost:8080/api/reports/689133bfac4c7b1c6579c7d4
 Content-Type: application/json
 
 {
+  "client": "68b60b84219ddcbd20d0eda2",
   "protocolNumber": "00001",
   "patient": {
     "sex": "hembra"
