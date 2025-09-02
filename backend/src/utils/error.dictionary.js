@@ -7,6 +7,10 @@ export const dictionary = {
     status: 404,
     message: "Client not found"
   },
+  clientRequired: {
+    status: 400,
+    message: "Client is required"
+  },
   reportNotFound: {
     status: 404,
     message: "Report not found"

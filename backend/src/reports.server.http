@@ -3,7 +3,7 @@ POST http://localhost:8080/api/reports/
 Content-Type: application/json
 
 {
-  "protocolNumber": "00001",
+  "protocolNumber": "00002",
   "patient": {
     "sex": "macho"
   },
@@ -34,3 +34,7 @@ Content-Type: application/json
     "sex": "hembra"
   }
 }
+
+### DELETE REPORT
+
+DELETE http://localhost:8080/api/reports/68b7602e33dc1c7c3e7875a1

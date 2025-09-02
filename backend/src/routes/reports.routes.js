@@ -1,9 +1,10 @@
 import { Router } from "express";
 import * as reportsControllers from "../controllers/reports.controllers.js";
+import * as middlewares from "../middlewares/middlewares.js"
 
 const router = Router();
 
-router.post("/", reportsControllers.POSTReport)
+router.post("/", middlewares.validateClient, reportsControllers.POSTReport)
 .get("/", reportsControllers.GETReports)
 .get("/:id", reportsControllers.GETReportById)
 .put("/:id", reportsControllers.PUTReport)

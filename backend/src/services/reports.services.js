@@ -5,12 +5,12 @@ import dictionary from '../utils/error.dictionary.js';
 export async function createReport(data) {
   const existing = await ReportsModel.findOne({ protocolNumber: data.protocolNumber }).lean();
   if (existing) CustomError.new(dictionary.protocolNumberExists);
-  return await ReportsModel.create(data)
+  return await ReportsModel.create(data);
 }
 
 export async function getReports(filters) {
   const { limit = 20, page = 1, ...query } = filters;
-  const options = { page, limit, sort: { createdAt: -1 }, lean: true };
+  const options = { page, limit, sort: { createdAt: -1 }, lean: true, populate: { path: "client", select: "name email" } };
   return await ReportsModel.paginate(query, options);
 }
 
