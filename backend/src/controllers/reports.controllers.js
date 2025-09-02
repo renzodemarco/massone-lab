@@ -58,6 +58,19 @@ export async function DELETEReport(req, res, next) {
     res.status(200).json({ success: true, payload: report });
   }
   catch (e) {
-    next(e)
+    next(e);
   }
 }
+
+export async function GETpdfReport(req, res, next) {
+  try {
+    const pdfBuffer = await reportsServices.generateReport(req.params.id);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=reporte-${req.params.id}.pdf`);
+    res.send(pdfBuffer);
+  } 
+  catch (e) {
+    next(e);
+  }
+};

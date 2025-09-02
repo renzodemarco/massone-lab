@@ -38,3 +38,8 @@ Content-Type: application/json
 ### DELETE REPORT
 
 DELETE http://localhost:8080/api/reports/68b7602e33dc1c7c3e7875a1
+
+
+### GET REPORT IN PDF
+
+GET http://localhost:8080/api/reports/pdf/689133bfac4c7b1c6579c7d4

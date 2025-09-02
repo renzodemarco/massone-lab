@@ -1,4 +1,5 @@
 import ReportsModel from '../models/reports.model.js';
+import * as pdf from '../utils/pdf.generator.js'
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
 
@@ -33,4 +34,11 @@ export async function deleteReport(id) {
   const report = await ReportsModel.findById(id)
   if (!report) CustomError.new(dictionary.reportNotFound);
   return report;
+}
+
+export async function generateReport(id) {
+  const report = await ReportsModel.findById(id)
+  if (!report) CustomError.new(dictionary.reportNotFound);
+  const pdfBuffer = await pdf.generateCitoPDF(report);
+  return pdfBuffer;
 }
