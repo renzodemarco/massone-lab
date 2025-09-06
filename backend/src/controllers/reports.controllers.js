@@ -38,6 +38,16 @@ export async function GETReportById(req, res, next) {
   }
 }
 
+export async function GETReportByNumber(req, res, next) {
+  try {
+    const report = await reportsServices.getReportByNumber(req.params.n)
+    res.status(200).json({ success: true, payload: report })
+  }
+  catch (e) {
+    next(e)
+  }
+}
+
 export async function PUTReport(req, res, next) {
   try {
     const { id } = req.params;

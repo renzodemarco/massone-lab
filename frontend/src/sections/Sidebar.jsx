@@ -1,12 +1,10 @@
+import { useNavigate } from "react-router-dom";
+import SidebarMenu from "../components/SidebarMenu";
 
-const menuItems = [
-  { label: "Inicio" },
-  { label: "Informes", active: true },
-  { label: "Clientes" },
-  { label: "Ayuda" },
-];
+export default function Sidebar({ view, setView, back }) {
 
-export default function Sidebar() {
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col gap-2 bg-white p-4 min-h-screen">
       <div className="flex gap-3 mb-6 items-center">
@@ -16,20 +14,18 @@ export default function Sidebar() {
             backgroundImage: `url("/logo.png")`,
           }}
         />
-        <h1 className="text-[#111418] text-base font-medium">Laboratorio Massone</h1>
+        <h2 className="text-[#111418] text-base font-medium">Laboratorio Massone</h2>
       </div>
-
-      {menuItems.map((item) => (
-        <div
-          key={item.label}
-          className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
-            item.active ? "bg-[#f0f2f4]" : ""
-          }`}
+      {
+        back ? <button
+          className="bg-[#632b91] text-white px-6 py-2 rounded-lg transition font-bold link-button"
+          onClick={() => navigate("/")}
         >
-          <div className="text-[#111418]">{/* Aquí iría el SVG de icono */}</div>
-          <p className="text-[#111418] text-sm font-medium">{item.label}</p>
-        </div>
-      ))}
+          Volver
+        </button> :
+          <SidebarMenu view={view} setView={setView} />
+      }
+
     </div>
   );
 }

@@ -21,6 +21,12 @@ export async function getReportById(id) {
   return report;
 }
 
+export async function getReportByNumber(n) {
+  const report = await ReportsModel.findOne({protocolNumber: n}).populate("client", "name email");
+  if (!report) CustomError.new(dictionary.reportNotFound);
+  return report;
+}
+
 export async function updateReport(id, data) {
   const report = await ReportsModel.findByIdAndUpdate(id, data, {
     new: true,
@@ -31,7 +37,7 @@ export async function updateReport(id, data) {
 }
 
 export async function deleteReport(id) {
-  const report = await ReportsModel.findById(id)
+  const report = await ReportsModel.findByIdAndDelete(id)
   if (!report) CustomError.new(dictionary.reportNotFound);
   return report;
 }

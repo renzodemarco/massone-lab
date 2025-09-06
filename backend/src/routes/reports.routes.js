@@ -7,6 +7,7 @@ const router = Router();
 router.post("/", middlewares.validateClient, reportsControllers.POSTReport)
 .get("/", reportsControllers.GETReports)
 .get("/:id", reportsControllers.GETReportById)
+.get("/number/:n", reportsControllers.GETReportByNumber)
 .get("/pdf/:id", reportsControllers.GETpdfReport)
 .put("/:id", reportsControllers.PUTReport)
 .delete("/:id", reportsControllers.DELETEReport);

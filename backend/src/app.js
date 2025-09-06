@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 import config from "./config/env.config.js";
 import connectDB from './config/mongo.config.js';
 import clientsRouter from "./routes/clients.routes.js";
@@ -11,6 +12,7 @@ const PORT = config.PORT || 8081;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "http://localhost:5173" }));
 
 app.use("/api/clients", clientsRouter);
 app.use("/api/reports", reportsRouter);

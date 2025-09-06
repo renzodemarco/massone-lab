@@ -6,16 +6,13 @@ export async function validateClient(req, res, next) {
   try {
     const { client } = req.body;
 
-    if (!client) {
-      return next(CustomError.new(dictionary.clientRequired));
-    }
+    if (!client)CustomError.new(dictionary.clientRequired)
 
     const exists = await ClientModel.findById(client).lean();
-    if (!exists) {
-      return next(CustomError.new(dictionary.clientNotFound));
-    }
 
-    next();
+    if (!exists) CustomError.new(dictionary.clientNotFound);
+
+    next()
   } 
   catch (e) {
     next(e);

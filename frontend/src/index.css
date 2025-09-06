@@ -27,12 +27,18 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
+  color: var(--color-text);
+  display: inline;
+}
+
+h2 {
   color: var(--color-primary);
+  display: inline;
 }
 
 
-a {
+/* a {
   font-weight: 500;
   color: var(--color-secondary);
   text-decoration: inherit;
@@ -40,4 +46,15 @@ a {
 a:hover {
   color: var(--color-background);
   filter: opacity(1.2);
+} */
+
+.link-button {
+  border: solid 2px transparent;
+}
+
+.link-button:hover {
+  background-color: rgba(99, 43, 145, .05);
+  color: var(--color-primary);;
+  border-color: var(--color-primary);
+  cursor: pointer;
 }

@@ -5,10 +5,10 @@ Content-Type: application/json
 {
   "protocolNumber": "00002",
   "patient": {
-    "sex": "macho"
+    "sex": "hembra"
   },
-  "client": "64f1a5b2c3d4e56789012345",
-  "studyType": "cito"
+  "client": "68b60b84219ddcbd20d0eda2",
+  "studyType": "hp"
 }
 
 
@@ -20,6 +20,11 @@ GET http://localhost:8080/api/reports/
 ### GET REPORT BY ID
 
 GET http://localhost:8080/api/reports/689133bfac4c7b1c6579c7d4
+
+
+### GET REPORT BY NUMBER
+
+GET http://localhost:8080/api/reports/number/00002
 
 
 ### PUT REPORT
@@ -37,7 +42,7 @@ Content-Type: application/json
 
 ### DELETE REPORT
 
-DELETE http://localhost:8080/api/reports/68b7602e33dc1c7c3e7875a1
+DELETE http://localhost:8080/api/reports/68b7601933dc1c7c3e78759e
 
 
 ### GET REPORT IN PDF
