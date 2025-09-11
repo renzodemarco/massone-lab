@@ -26,7 +26,7 @@ const patientSchema = new mongoose.Schema(
     sex: {
       type: String,
       enum: ['macho', 'hembra'],
-      required: true
+      default: undefined 
     },
     color: {
       type: String,

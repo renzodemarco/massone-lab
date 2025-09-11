@@ -166,7 +166,6 @@ export default function ReportDetail() {
               Castrado
             </label>
 
-            {/* Otros campos */}
             <input
               type="text"
               name="veterinarian"

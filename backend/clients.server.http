@@ -3,11 +3,11 @@ POST http://localhost:8080/api/clients/
 Content-Type: application/json
 
 {
-  "name": "Client Test",
-  "email": "test@example.com",
-  "address": "Fake Street 123",
-  "phone": "123456789",
-  "veterinarians": ["Dr. House", "Dra. Wilson"]
+    "name": "Clínica Veterinaria Mitre",
+    "email": "mitre@vet.com",
+    "address": "Bartolomé Mitre 678",
+    "phone": "1198765432",
+    "veterinarians": []
 }
 
 ### GET CLIENTS
@@ -24,4 +24,4 @@ Content-Type: application/json
 
 ### DELETE CLIENT
 
-DELETE http://localhost:8080/api/clients/6887e6099456012b51943dc2
+DELETE http://localhost:8080/api/clients/68b60b84219ddcbd20d0eda2

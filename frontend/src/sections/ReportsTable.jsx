@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getReports } from "../services/reports";
+import { useNavigate } from "react-router-dom";
 
 export default function ReportsTable() {
 
   const [data, setData] = useState({ docs: [] })
+  const navigate = useNavigate();
 
   useEffect(() => {
     getReports().then(setData).catch(console.error);
@@ -21,7 +23,7 @@ export default function ReportsTable() {
             <th className="px-4 py-3 text-center">Fecha de Entrada</th>
             <th className="px-4 py-3 text-center">Fecha Límite</th>
             <th className="px-4 py-3 text-center">Estado</th>
-            <th className="px-4 py-3 text-center">Informe</th>
+            <th className="px-4 py-3 text-center"></th>
           </tr>
         </thead>
         <tbody>
@@ -34,7 +36,14 @@ export default function ReportsTable() {
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{new Date(r.entryDate).toLocaleDateString("es-AR")}</td>
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{new Date(r.dueDate).toLocaleDateString("es-AR")}</td>
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{r.status}</td>
-              <td className="px-4 py-2 text-sm font-bold text-[#637588] text-center">Ver</td>
+              <td className="px-4 py-2 text-sm text-center">
+                <button
+                  className="bg-[#632b91] text-white px-3 py-2 rounded-lg transition font-semibold link-button"
+                  onClick={() => navigate(`/report/${r.protocolNumber}`)}
+                >
+                  Ver Informe
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

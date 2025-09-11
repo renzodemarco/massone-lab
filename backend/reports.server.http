@@ -3,12 +3,25 @@ POST http://localhost:8080/api/reports/
 Content-Type: application/json
 
 {
-  "protocolNumber": "00002",
+  "protocolNumber": "00004",
+  "veterinarian": "Dra. Gómez",
+  "client": "68c2ac80093877decae19d2d",
+  "studyType": "hp",
+  "sampleInfo": "Muestra de tejido muscular de la pata trasera.",
+  "macroDescription": "Tejido firme, color rosado claro, sin signos de necrosis.",
+  "microDescription": "Células musculares normales, infiltrado inflamatorio leve.",
+  "comments": "Paciente se recupera bien de su cirugía reciente.",
+  "result": "Sin hallazgos patológicos graves.",
   "patient": {
-    "sex": "hembra"
-  },
-  "client": "68b60b84219ddcbd20d0eda2",
-  "studyType": "hp"
+    "owner": "María López",
+    "name": "Milo",
+    "species": "Gato",
+    "breed": "Siamés",
+    "age": "4 años",
+    "sex": "hembra",
+    "color": "Gris claro",
+    "neutered": false
+  }
 }
 
 
