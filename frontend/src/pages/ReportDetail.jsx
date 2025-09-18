@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { getReportByNumber, updateReport } from "../services/reports";
+import { getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 
 export default function ReportDetail() {
+
   const { n } = useParams();
-  const navigate = useNavigate();
-  const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState([]);
+
+  const { register, handleSubmit, reset, setValue } = useForm();
 
   useEffect(() => {
     getReportByNumber(n)
       .then((data) => {
-        setReport({
+        reset({
           protocolNumber: data.protocolNumber,
           status: data.status,
           patient: {
@@ -23,10 +26,10 @@ export default function ReportDetail() {
             age: data.patient.age || "",
             sex: data.patient.sex || "macho",
             color: data.patient.color || "",
-            neutered: data.patient.neutered || false
+            neutered: data.patient.neutered || false,
           },
           veterinarian: data.veterinarian || "",
-          client: data.client || "",
+          client: data.client._id || "",
           studyType: data.studyType || "cito",
           sampleInfo: data.sampleInfo || "",
           macroDescription: data.macroDescription || "",
@@ -35,29 +38,19 @@ export default function ReportDetail() {
           result: data.result || "",
           entryDate: data.entryDate?.split("T")[0] || "",
           dueDate: data.dueDate?.split("T")[0] || "",
-          _id: data._id
+          _id: data._id,
         });
-        setLoading(false);
+        console.log(data.patient.species)
       })
       .catch(console.error);
-  }, [n]);
+    getClients()
+      .then(data => setClients(data || []))
+      .catch(err => console.error(err));
+  }, [n, reset]);
 
-  const handleChange = (e, nested = false) => {
-    if (nested) {
-      const { name, value, type, checked } = e.target;
-      setReport({
-        ...report,
-        patient: { ...report.patient, [name]: type === "checkbox" ? checked : value }
-      });
-    } else {
-      setReport({ ...report, [e.target.name]: e.target.value });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (formData) => {
     try {
-      await updateReport(report._id, report);
+      await updateReport(formData._id, formData);
       alert("Reporte actualizado!");
       navigate("/");
     } catch (err) {
@@ -66,189 +59,157 @@ export default function ReportDetail() {
     }
   };
 
-  if (loading) return <p>Cargando...</p>;
-
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
       <Sidebar back={true} />
-      <div className="p-6 min-h-screen max-w-3xl mx-auto">
-        <div className=" px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
+      <div className="p-6 min-h-screen w-[1000px] mx-auto">
+        <div className="px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
           <h1 className="text-2xl font-bold mb-4">Informe {n}</h1>
-          <form className="pt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
-            {/* Protocolo y Estado */}
-            <input
-              type="text"
-              name="protocolNumber"
-              value={report.protocolNumber}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              placeholder="Número de protocolo"
-            />
-            <select
-              name="status"
-              value={report.status}
-              onChange={handleChange}
-              className="border p-2 rounded"
-            >
-              <option value="entered">Ingresado</option>
-              <option value="started">Iniciado</option>
-              <option value="finished">Finalizado</option>
-              <option value="sent">Enviado</option>
-              <option value="cancelled">Cancelado</option>
-            </select>
+          <form onSubmit={handleSubmit(onSubmit)} className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4">
 
-            {/* Datos del Paciente */}
-            <h2 className="font-bold">Paciente</h2>
-            <input
-              type="text"
-              name="owner"
-              value={report.patient.owner}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Dueño"
-              className="border p-2 rounded"
-            />
-            <input
-              type="text"
-              name="name"
-              value={report.patient.name}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Nombre"
-              className="border p-2 rounded"
-            />
-            <input
-              type="text"
-              name="species"
-              value={report.patient.species}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Especie"
-              className="border p-2 rounded"
-            />
-            <input
-              type="text"
-              name="breed"
-              value={report.patient.breed}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Raza"
-              className="border p-2 rounded"
-            />
-            <input
-              type="text"
-              name="age"
-              value={report.patient.age}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Edad"
-              className="border p-2 rounded"
-            />
-            <select
-              name="sex"
-              value={report.patient.sex}
-              onChange={(e) => handleChange(e, true)}
-              className="border p-2 rounded"
-            >
-              <option value="macho">Macho</option>
-              <option value="hembra">Hembra</option>
-            </select>
-            <input
-              type="text"
-              name="color"
-              value={report.patient.color}
-              onChange={(e) => handleChange(e, true)}
-              placeholder="Color"
-              className="border p-2 rounded"
-            />
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="neutered"
-                checked={report.patient.neutered}
-                onChange={(e) => handleChange(e, true)}
-              />
-              Castrado
-            </label>
-
-            <input
-              type="text"
-              name="veterinarian"
-              value={report.veterinarian}
-              onChange={handleChange}
-              placeholder="Veterinario"
-              className="border p-2 rounded"
-            />
-            <select
-              name="studyType"
-              value={report.studyType}
-              onChange={handleChange}
-              className="border p-2 rounded"
-            >
-              <option value="cito">Citología</option>
-              <option value="hp">Histopatología</option>
-              <option value="ihq">IHQ</option>
-            </select>
-            <textarea
-              name="sampleInfo"
-              value={report.sampleInfo}
-              onChange={handleChange}
-              placeholder="Información de la muestra"
-              className="border p-2 rounded"
-            />
-            <textarea
-              name="macroDescription"
-              value={report.macroDescription}
-              onChange={handleChange}
-              placeholder="Descripción macroscópica"
-              className="border p-2 rounded"
-            />
-            <textarea
-              name="microDescription"
-              value={report.microDescription}
-              onChange={handleChange}
-              placeholder="Descripción microscópica"
-              className="border p-2 rounded"
-            />
-            <textarea
-              name="comments"
-              value={report.comments}
-              onChange={handleChange}
-              placeholder="Comentarios"
-              className="border p-2 rounded"
-            />
-            <textarea
-              name="result"
-              value={report.result}
-              onChange={handleChange}
-              placeholder="Resultado"
-              className="border p-2 rounded"
-            />
-
-            <div className="flex gap-2">
-              <label>Fecha de Entrada</label>
-              <input
-                type="date"
-                name="entryDate"
-                value={report.entryDate}
-                onChange={handleChange}
-                className="border p-2 rounded"
-              />
-              <label>Fecha Límite</label>
-              <input
-                type="date"
-                name="dueDate"
-                value={report.dueDate}
-                onChange={handleChange}
-                className="border p-2 rounded"
-              />
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
+              <input {...register("protocolNumber")} id="protocolNumber" className="border p-2 rounded" />
             </div>
 
-            <button
-              disabled={loading}
-              type="submit"
-              className="bg-[#632b91] hover:bg-[#632b91]/90 text-white p-2 rounded font-bold"
-            >
-              Guardar Cambios
-            </button>
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
+              <select {...register("status")} id="status" className="border p-2 rounded">
+                <option value="entered">Ingresado</option>
+                <option value="started">Iniciado</option>
+                <option value="finished">Finalizado</option>
+                <option value="sent">Enviado</option>
+                <option value="cancelled">Cancelado</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
+              <select {...register("client")} id="client" className="border p-2 rounded" >
+                {clients.map(client => (
+                  <option key={client._id} value={client._id}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="veterinarian">Veterinario/a</label>
+              <input {...register("veterinarian")} id="veterinarian" className="border p-2 rounded" />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="studyType">Tipo de Estudio</label>
+              <select {...register("studyType")} className="border p-2 rounded">
+                <option value="cito">Citología</option>
+                <option value="hp">Histopatología</option>
+                <option value="ihq">Inmunohistoquímica</option>
+              </select>
+            </div>
+
+            <h2 className="text-2xl font-bold mt-4 col-span-2">Paciente</h2>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="owner">Propietario/a</label>
+              <input {...register("patient.owner")} id="owner" className="border p-2 rounded" />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="owner">Nombre</label>
+              <input {...register("patient.name")} className="border p-2 rounded" />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
+              <select {...register("patient.species")} id="species" className="border p-2 rounded">
+                <option value="">Seleccione</option>
+                <option value="canine">Canino</option>
+                <option value="feline">Felino</option>
+                <option value="equine">Equino</option>
+                <option value="bovine">Bovino</option>
+                <option value="porcine">Porcino</option>
+                <option value="other">Otro</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="breed">Raza</label>
+              <input {...register("patient.breed")} id="breed" className="border p-2 rounded" />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="age">Edad</label>
+              <input {...register("patient.age")} id="age" className="border p-2 rounded" />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="sex">Sexo</label>
+              <select {...register("patient.sex")} id="sex" className="border p-2 rounded">
+                <option value="">Desconocido</option>
+                <option value="macho">Macho</option>
+                <option value="hembra">Hembra</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="neutered">Castrado</label>
+              <select
+                id="neutered"
+                className="border p-2 rounded"
+                {...register("patient.neutered")}
+                onChange={e => {
+                  const val = e.target.value;
+                  setValue("patient.neutered", val === "" ? undefined : val === "true");
+                }}
+              >
+                <option value="">Desconocido</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="color">Color</label>
+              <input {...register("patient.color")} id="color" className="border p-2 rounded" />
+            </div>
+
+            <h2 className="text-2xl font-bold mt-4 col-span-2">Resultados</h2>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium" htmlFor="sampleInfo">Muestra Remitida</label>
+              <textarea {...register("sampleInfo")} id="sampleInfo" className="border p-2 rounded w-full" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium" htmlFor="macroDescription">Descripción Macroscópica</label>
+              <textarea {...register("macroDescription")} id="macroDescription" className="border p-2 rounded w-full min-h-[100px]" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium" htmlFor="microDescription">Descripción Microscópica</label>
+              <textarea {...register("microDescription")} id="microDescription" className="border p-2 rounded w-full min-h-[100px]" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium" htmlFor="comments">Comentarios</label>
+              <textarea {...register("comments")} id="comments" className="border p-2 rounded w-full" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
+              <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
+            </div>
+
+            <div className="flex justify-center col-span-2">
+              <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
+                Guardar Informe
+              </button>
+            </div>
+
           </form>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

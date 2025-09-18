@@ -13,7 +13,7 @@ export default function ReportCreate() {
       .catch(err => console.error(err));
   }, []);
 
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       protocolNumber: "",
       status: "entered",
@@ -50,10 +50,12 @@ export default function ReportCreate() {
         <div className=" px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
           <h1 className="text-3xl font-bold mb-4">Crear Informe</h1>
           <form onSubmit={handleSubmit(onSubmit)} className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4">
+
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
               <input {...register("protocolNumber")} id="protocolNumber" className="border p-2 rounded" />
             </div>
+
             <div>
               <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
               <select {...register("status")} id="status" className="border p-2 rounded">
@@ -64,6 +66,7 @@ export default function ReportCreate() {
                 <option value="cancelled">Cancelado</option>
               </select>
             </div>
+
             <div>
               <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
               <select {...register("client")} id="client" className="border p-2 rounded" >
@@ -81,7 +84,7 @@ export default function ReportCreate() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="veterinarian">Tipo de Estudio</label>
+              <label className="block mb-1 font-medium" htmlFor="studyType">Tipo de Estudio</label>
               <select {...register("studyType")} className="border p-2 rounded">
                 <option value="cito">Citología</option>
                 <option value="hp">Histopatología</option>
@@ -103,7 +106,7 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
-              <select {...register("patient.species")} id="species" className="border p-2 rounded w-full">
+              <select {...register("patient.species")} id="species" className="border p-2 rounded">
                 <option value="">Seleccione</option>
                 <option value="Canino">Canino</option>
                 <option value="Felino">Felino</option>
@@ -135,11 +138,19 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="neutered">Castrado</label>
-              <select {...register("patient.neutered")} id="neutered" className="border p-2 rounded">
-                <option value="">Desconocido</option>
-                <option value="si">Sí</option>
-                <option value="no">No</option>
-              </select>
+            <select
+              id="neutered"
+              className="border p-2 rounded"
+              {...register("patient.neutered")}
+              onChange={e => {
+                const val = e.target.value;
+                setValue("patient.neutered", val === "" ? undefined : val === "true");
+              }}
+            >
+              <option value="">Desconocido</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
             </div>
 
             <div>
@@ -170,15 +181,17 @@ export default function ReportCreate() {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium" htmlFor="result">Resultado</label>
+              <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
               <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
             </div>
 
-            <button type="submit" className="bg-purple-700 text-white p-2 rounded font-semibold col-span-2">
-              Crear reporte
-            </button>
-          </form>
+            <div className="flex justify-center col-span-2">
+              <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
+                Crear Informe
+              </button>
+            </div>
 
+          </form>
         </div>
       </div>
     </div>
