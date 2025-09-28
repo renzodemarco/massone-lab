@@ -1,14 +1,18 @@
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
+import { useNavigate } from "react-router-dom";
 import { getClients } from "../services/clients";
 import { postReport } from "../services/reports";
 import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
 import Sidebar from "../sections/Sidebar";
+import Loading from "../components/Loading";
 
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     getClients()
@@ -45,9 +49,18 @@ export default function ReportCreate() {
     getNextReportNumber().then(next => setValue("protocolNumber", next));
   }, [setValue]);
 
-  const onSubmit = (data) => {
-    console.log("Reporte listo para enviar:", data);
-    createReport(data)
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      await postReport(data);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -161,19 +174,19 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="breed">Raza</label>
-              <input 
-                {...register("patient.breed")} 
-                id="breed" 
-                className="border p-2 rounded" 
+              <input
+                {...register("patient.breed")}
+                id="breed"
+                className="border p-2 rounded"
               />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="age">Edad</label>
-              <input 
-                {...register("patient.age")} 
-                id="age" 
-                className="border p-2 rounded" 
+              <input
+                {...register("patient.age")}
+                id="age"
+                className="border p-2 rounded"
               />
             </div>
 
@@ -237,10 +250,10 @@ export default function ReportCreate() {
 
             <div className="flex justify-center col-span-2">
               <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
-                Crear Informe
+                Crear informe
               </button>
             </div>
-
+            {loading && <Loading />}
           </form>
         </div>
       </div>
