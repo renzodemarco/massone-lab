@@ -22,9 +22,14 @@ export async function getReportById(id) {
 }
 
 export async function getReportByNumber(n) {
-  const report = await ReportsModel.findOne({protocolNumber: n}).populate("client", "name email");
+  const report = await ReportsModel.findOne({ protocolNumber: n }).populate("client", "name email");
   if (!report) CustomError.new(dictionary.reportNotFound);
   return report;
+}
+
+export async function getLastReportNumber() {
+  const last = await ReportsModel.findOne().sort({ protocolNumber: -1 }).select("protocolNumber").lean();
+  return last?.protocolNumber || "00000";
 }
 
 export async function updateReport(id, data) {

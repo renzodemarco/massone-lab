@@ -48,6 +48,16 @@ export async function GETReportByNumber(req, res, next) {
   }
 }
 
+export async function GETLastReportNumber(req, res, next) {
+  try {
+    const number = await reportsServices.getLastReportNumber();
+    res.status(200).json({ success: true, payload: number })
+  }
+  catch (e) {
+    next(e)
+  }
+}
+
 export async function PUTReport(req, res, next) {
   try {
     const { id } = req.params;
@@ -79,7 +89,7 @@ export async function GETpdfReport(req, res, next) {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=reporte-${req.params.id}.pdf`);
     res.send(pdfBuffer);
-  } 
+  }
   catch (e) {
     next(e);
   }

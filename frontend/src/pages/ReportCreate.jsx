@@ -1,6 +1,9 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { getClients } from "../services/clients";
+import { postReport } from "../services/reports";
+import getNextReportNumber from "../utils/getNextProtocolNumber";
+import FormError from "../components/FormError";
 import Sidebar from "../sections/Sidebar";
 
 export default function ReportCreate() {
@@ -13,7 +16,7 @@ export default function ReportCreate() {
       .catch(err => console.error(err));
   }, []);
 
-  const { register, handleSubmit, watch, setValue } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
       protocolNumber: "",
       status: "entered",
@@ -38,6 +41,10 @@ export default function ReportCreate() {
     },
   });
 
+  useEffect(() => {
+    getNextReportNumber().then(next => setValue("protocolNumber", next));
+  }, [setValue]);
+
   const onSubmit = (data) => {
     console.log("Reporte listo para enviar:", data);
     createReport(data)
@@ -53,12 +60,21 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
-              <input {...register("protocolNumber")} id="protocolNumber" className="border p-2 rounded" />
+              <input
+                {...register("protocolNumber", { required: "El número de protocolo es obligatorio" })}
+                id="protocolNumber"
+                className="border p-2 rounded"
+              />
+              <FormError message={errors.protocolNumber?.message} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
-              <select {...register("status")} id="status" className="border p-2 rounded">
+              <select
+                {...register("status")}
+                id="status"
+                className="border p-2 rounded"
+              >
                 <option value="entered">Ingresado</option>
                 <option value="started">Iniciado</option>
                 <option value="finished">Finalizado</option>
@@ -69,23 +85,37 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-              <select {...register("client")} id="client" className="border p-2 rounded" >
+              <select
+                {...register("client", { required: "El cliente es obligatorio" })}
+                id="client"
+                className="border p-2 rounded"
+              >
+                <option value="">Seleccione</option>
                 {clients.map(client => (
                   <option key={client._id} value={client._id}>
                     {client.name}
                   </option>
                 ))}
               </select>
+              <FormError message={errors.client?.message} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="veterinarian">Veterinario/a</label>
-              <input {...register("veterinarian")} id="veterinarian" className="border p-2 rounded" />
+              <input
+                {...register("veterinarian")}
+                id="veterinarian"
+                className="border p-2 rounded"
+              />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="studyType">Tipo de Estudio</label>
-              <select {...register("studyType")} className="border p-2 rounded">
+              <select
+                {...register("studyType")}
+                id="studyType"
+                className="border p-2 rounded"
+              >
                 <option value="cito">Citología</option>
                 <option value="hp">Histopatología</option>
                 <option value="ihq">Inmunohistoquímica</option>
@@ -96,17 +126,29 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="owner">Propietario/a</label>
-              <input {...register("patient.owner")} id="owner" className="border p-2 rounded" />
+              <input
+                {...register("patient.owner")}
+                id="owner"
+                className="border p-2 rounded"
+              />
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="owner">Nombre</label>
-              <input {...register("patient.name")} className="border p-2 rounded" />
+              <label className="block mb-1 font-medium" htmlFor="name">Nombre</label>
+              <input
+                {...register("patient.name")}
+                id="name"
+                className="border p-2 rounded"
+              />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
-              <select {...register("patient.species")} id="species" className="border p-2 rounded">
+              <select
+                {...register("patient.species")}
+                id="species"
+                className="border p-2 rounded"
+              >
                 <option value="">Seleccione</option>
                 <option value="Canino">Canino</option>
                 <option value="Felino">Felino</option>
@@ -119,12 +161,20 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="breed">Raza</label>
-              <input {...register("patient.breed")} id="breed" className="border p-2 rounded" />
+              <input 
+                {...register("patient.breed")} 
+                id="breed" 
+                className="border p-2 rounded" 
+              />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="age">Edad</label>
-              <input {...register("patient.age")} id="age" className="border p-2 rounded" />
+              <input 
+                {...register("patient.age")} 
+                id="age" 
+                className="border p-2 rounded" 
+              />
             </div>
 
             <div>
@@ -138,19 +188,19 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="neutered">Castrado</label>
-            <select
-              id="neutered"
-              className="border p-2 rounded"
-              {...register("patient.neutered")}
-              onChange={e => {
-                const val = e.target.value;
-                setValue("patient.neutered", val === "" ? undefined : val === "true");
-              }}
-            >
-              <option value="">Desconocido</option>
-              <option value="true">Sí</option>
-              <option value="false">No</option>
-            </select>
+              <select
+                id="neutered"
+                className="border p-2 rounded"
+                {...register("patient.neutered")}
+                onChange={e => {
+                  const val = e.target.value;
+                  setValue("patient.neutered", val === "" ? undefined : val === "true");
+                }}
+              >
+                <option value="">Desconocido</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
             </div>
 
             <div>

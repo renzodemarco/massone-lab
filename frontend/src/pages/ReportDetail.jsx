@@ -116,7 +116,7 @@ export default function ReportDetail() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="owner">Nombre</label>
+              <label className="block mb-1 font-medium" htmlFor="name">Nombre</label>
               <input {...register("patient.name")} className="border p-2 rounded" />
             </div>
 
