@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { getReportByNumber, updateReport } from "../services/reports";
 import { getClients } from "../services/clients";
+import speciesOptions from "../utils/species"
 import Sidebar from "../sections/Sidebar";
 
 export default function ReportDetail() {
@@ -122,7 +123,7 @@ export default function ReportDetail() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
-              <select {...register("patient.species")} id="species" className="border p-2 rounded">
+              <select {...register("patient.species")} id="species" className="border p-2 rounded" defaultValue="">
                 <option value="">Seleccione</option>
                 <option value="canine">Canino</option>
                 <option value="feline">Felino</option>

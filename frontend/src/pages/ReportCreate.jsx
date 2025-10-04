@@ -157,18 +157,14 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
-              <select
-                {...register("patient.species")}
-                id="species"
-                className="border p-2 rounded"
-              >
+              <select {...register("patient.species")} id="species" className="border p-2 rounded" defaultValue="">
                 <option value="">Seleccione</option>
-                <option value="Canino">Canino</option>
-                <option value="Felino">Felino</option>
-                <option value="Equino">Equino</option>
-                <option value="Bovino">Bovino</option>
-                <option value="Porcino">Porcino</option>
-                <option value="Otro">Otro</option>
+                <option value="canine">Canino</option>
+                <option value="feline">Felino</option>
+                <option value="equine">Equino</option>
+                <option value="bovine">Bovino</option>
+                <option value="porcine">Porcino</option>
+                <option value="other">Otro</option>
               </select>
             </div>
 
