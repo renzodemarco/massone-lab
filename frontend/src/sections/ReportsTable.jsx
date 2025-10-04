@@ -44,6 +44,14 @@ export default function ReportsTable() {
                   Ver Informe
                 </button>
               </td>
+              <td className="px-4 py-2 text-sm text-center">
+                <button
+                  className="bg-[#99144d] text-white px-3 py-2 rounded-lg transition font-semibold delete-button"
+                  onClick={() => navigate(`/report/${r.protocolNumber}`)}
+                >
+                  Eliminar
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

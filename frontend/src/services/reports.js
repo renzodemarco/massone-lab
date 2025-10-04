@@ -64,3 +64,13 @@ export async function updateReport(id, data) {
     return e;
   }
 }
+
+export async function deleteReport(id) {
+  try {
+    const res = await api.delete(`/reports/${id}`);
+    return res.data.payload;
+  } catch (e) {
+    console.error(e.message);
+    return e;
+  }
+}

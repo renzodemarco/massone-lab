@@ -48,13 +48,20 @@ a:hover {
   filter: opacity(1.2);
 } */
 
-.link-button {
+.link-button, .delete-button {
   border: solid 2px transparent;
 }
 
 .link-button:hover {
   background-color: rgba(99, 43, 145, .05);
-  color: var(--color-primary);;
+  color: var(--color-primary);
   border-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: rgba(99, 43, 145, .05);
+  color: var(--color-secondary);
+  border-color: var(--color-secondary);
   cursor: pointer;
 }
