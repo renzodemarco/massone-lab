@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useParams, useNavigate } from "react-router-dom";
 import { getReportByNumber, updateReport } from "../services/reports";
 import { getClients } from "../services/clients";
-import speciesOptions from "../utils/species"
 import Sidebar from "../sections/Sidebar";
 
 export default function ReportDetail() {
 
   const { n } = useParams();
   const [clients, setClients] = useState([]);
+  const navigate = useNavigate();
 
   const { register, handleSubmit, reset, setValue } = useForm();
 
@@ -39,9 +39,8 @@ export default function ReportDetail() {
           result: data.result || "",
           entryDate: data.entryDate?.split("T")[0] || "",
           dueDate: data.dueDate?.split("T")[0] || "",
-          _id: data._id,
+          _id: data._id
         });
-        console.log(data.patient.species)
       })
       .catch(console.error);
     getClients()
@@ -51,8 +50,9 @@ export default function ReportDetail() {
 
   const onSubmit = async (formData) => {
     try {
-      await updateReport(formData._id, formData);
-      alert("Reporte actualizado!");
+      const { _id, ...cleanData } = formData;
+      await updateReport(_id, cleanData);
+      alert("Informe actualizado!");
       navigate("/");
     } catch (err) {
       console.error(err);

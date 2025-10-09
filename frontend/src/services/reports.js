@@ -6,8 +6,8 @@ export async function postReport(data) {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message)
-    return e
+    console.error(e.response.data)
+    throw e;
   }
 }
 
@@ -17,8 +17,8 @@ export async function getReports() {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message)
-    return e
+    console.error(e.response.data)
+    throw e;
   }
 }
 
@@ -28,8 +28,8 @@ export async function getReportById(id) {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message)
-    return e
+    console.error(e.response.data)
+    throw e;
   }
 }
 
@@ -39,8 +39,8 @@ export async function getReportByNumber(n) {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message)
-    return e
+    console.error(e.response.data)
+    throw e
   }
 }
 
@@ -50,8 +50,8 @@ export async function getLastReportNumber() {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message);
-    return e;
+    console.error(e.response.data);
+    throw e;
   }
 }
 
@@ -60,17 +60,17 @@ export async function updateReport(id, data) {
     const res = await api.put(`/reports/${id}`, data);
     return res.data.payload;
   } catch (e) {
-    console.error(e.message);
-    return e;
+    console.error(e.response.data);
+    throw e;
   }
 }
 
-export async function deleteReport(id) {
+export async function destroyReport(id) {
   try {
     const res = await api.delete(`/reports/${id}`);
     return res.data.payload;
   } catch (e) {
-    console.error(e.message);
-    return e;
+    console.error(e.response.data);
+    throw e;
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getReports } from "../services/reports";
 import { useNavigate } from "react-router-dom";
+import { destroyReport } from "../services/reports";
 
 export default function ReportsTable() {
 
@@ -10,6 +11,23 @@ export default function ReportsTable() {
   useEffect(() => {
     getReports().then(setData).catch(console.error);
   }, []);
+
+  const handleDelete = async (id, protocolNumber) => {
+    const ok = window.confirm(`¿Seguro que querés eliminar el informe ${protocolNumber}?`);
+    if (!ok) return;
+
+    try {
+      await destroyReport(id);
+      setData(prev => ({
+        ...prev,
+        docs: prev.docs.filter(d => d._id !== id)
+      }));
+      alert("Reporte eliminado correctamente");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error al eliminar el reporte");
+    }
+  };
 
   return (
     <div className="overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
@@ -47,7 +65,7 @@ export default function ReportsTable() {
               <td className="px-4 py-2 text-sm text-center">
                 <button
                   className="bg-[#99144d] text-white px-3 py-2 rounded-lg transition font-semibold delete-button"
-                  onClick={() => navigate(`/report/${r.protocolNumber}`)}
+                  onClick={() => handleDelete(r._id, r.protocolNumber)}
                 >
                   Eliminar
                 </button>
