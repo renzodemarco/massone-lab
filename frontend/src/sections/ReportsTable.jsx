@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getReports } from "../services/reports";
 import { useNavigate } from "react-router-dom";
-import { destroyReport } from "../services/reports";
+import { destroyReport, generatePDF } from "../services/reports";
 
 export default function ReportsTable() {
 
@@ -22,10 +22,20 @@ export default function ReportsTable() {
         ...prev,
         docs: prev.docs.filter(d => d._id !== id)
       }));
-      alert("Reporte eliminado correctamente");
+      alert("Informe eliminado correctamente");
     } catch (err) {
       console.error(err);
-      alert(err.message || "Error al eliminar el reporte");
+      alert(err.message || "Error al eliminar el informe");
+    }
+  };
+
+  const handlePDF = async (id) => {
+
+    try {
+      await generatePDF(id);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error al generar pdf");
     }
   };
 
@@ -68,6 +78,14 @@ export default function ReportsTable() {
                   onClick={() => handleDelete(r._id, r.protocolNumber)}
                 >
                   Eliminar
+                </button>
+              </td>
+              <td className="px-4 py-2 text-sm text-center">
+                <button
+                  className="bg-[#632b91] text-white px-3 py-2 rounded-lg transition font-semibold link-button"
+                  onClick={() => handlePDF(r._id)}
+                >
+                  Generar PDF
                 </button>
               </td>
             </tr>

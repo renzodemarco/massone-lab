@@ -74,3 +74,15 @@ export async function destroyReport(id) {
     throw e;
   }
 }
+
+export async function generatePDF(id) {
+  try {
+    const res = await api.get(`/reports/pdf/${id}`, { responseType: 'blob' });
+    const file = new Blob([res.data], { type: 'application/pdf' });
+    const fileURL = URL.createObjectURL(file);
+    window.open(fileURL);
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
