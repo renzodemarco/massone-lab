@@ -60,4 +60,4 @@ DELETE http://localhost:8080/api/reports/68b7601933dc1c7c3e78759e
 
 ### GET REPORT IN PDF
 
-GET http://localhost:8080/api/reports/pdf/689133bfac4c7b1c6579c7d4
+GET http://localhost:8080/api/reports/pdf/68c2c5c1d1af9caec912b17f
