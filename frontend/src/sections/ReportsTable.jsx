@@ -69,7 +69,7 @@ export default function ReportsTable() {
                   className="bg-[#632b91] text-white px-3 py-2 rounded-lg transition font-semibold link-button"
                   onClick={() => navigate(`/report/${r.protocolNumber}`)}
                 >
-                  Ver Informe
+                  Editar
                 </button>
               </td>
               <td className="px-4 py-2 text-sm text-center">
@@ -85,7 +85,7 @@ export default function ReportsTable() {
                   className="bg-[#632b91] text-white px-3 py-2 rounded-lg transition font-semibold link-button"
                   onClick={() => handlePDF(r._id)}
                 >
-                  Generar PDF
+                  PDF
                 </button>
               </td>
             </tr>

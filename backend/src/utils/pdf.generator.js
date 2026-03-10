@@ -158,11 +158,19 @@ export const generateCitoPDF = data => {
         .fillColor("#000")
         .text("Sexo:", 50, 312);
 
+      const sexLabel = data.patient.sex === "unknown" ? "Desconocido" : data.patient.sex;
+      const neuteredLabel =
+        data.patient.neutered === "neutered"
+          ? "SÃ­"
+          : data.patient.neutered === "intact"
+            ? "No"
+            : "Desconocido";
+
       doc
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.sex}`, 81, 312);
+        .text(`${sexLabel}`, 81, 312);
 
       doc
         .font("Calibri-Bold")
@@ -174,7 +182,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.neutered}`, 352, 312);
+        .text(`${neuteredLabel}`, 352, 312);
 
       doc.moveTo(50, 335).lineTo(550, 335).strokeColor("#632b91").lineWidth(0.2).stroke();
 

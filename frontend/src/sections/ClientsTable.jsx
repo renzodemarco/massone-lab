@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getClients } from "../services/clients";
 
 export default function ReportsTable() {
 
   const [data, setData] = useState([])
+  const navigate = useNavigate();
 
   useEffect(() => {
     getClients().then(setData).catch(console.error);
@@ -25,6 +27,14 @@ export default function ReportsTable() {
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{c.name}</td>
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{c.adress || "-"}</td>
               <td className="px-4 py-2 text-sm text-[#637588] text-center">{c.email}</td>
+              <td className="px-4 py-2 text-sm text-center">
+                <button
+                  className="bg-[#632b91] text-white px-3 py-2 rounded-lg transition font-semibold link-button"
+                  onClick={() => navigate(`/client/${c._id}`)}
+                >
+                  Editar
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

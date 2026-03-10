@@ -1,5 +1,5 @@
 import Table from './ReportsTable';
-import SearchBar from './Searchbar';
+import SearchBar from './SearchBar';
 import { useNavigate } from "react-router-dom";
 
 function Reports() {
@@ -12,7 +12,7 @@ function Reports() {
         <h1 className="text-2xl font-bold text-[#111418]">Informes</h1>
         <button 
           className="bg-[#632b91] text-white px-6 py-2 rounded-lg transition font-bold link-button"
-          onClick={() => navigate("/new")}
+          onClick={() => navigate("/report/new")}
         >
           Informe Nuevo
         </button>

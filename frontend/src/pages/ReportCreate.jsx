@@ -30,9 +30,9 @@ export default function ReportCreate() {
         species: "",
         breed: "",
         age: "",
-        sex: undefined,
+        sex: "unknown",
         color: "",
-        neutered: undefined,
+        neutered: "unknown",
       },
       veterinarian: "",
       client: "",
@@ -54,7 +54,7 @@ export default function ReportCreate() {
       setLoading(true);
       await postReport(data);
       setTimeout(() => {
-        navigate("/");
+        navigate("/?view=reports");
       }, 1000);
     } catch (err) {
       console.error(err);
@@ -189,7 +189,7 @@ export default function ReportCreate() {
             <div>
               <label className="block mb-1 font-medium" htmlFor="sex">Sexo</label>
               <select {...register("patient.sex")} id="sex" className="border p-2 rounded">
-                <option value="">Desconocido</option>
+                <option value="unknown">Desconocido</option>
                 <option value="macho">Macho</option>
                 <option value="hembra">Hembra</option>
               </select>
@@ -201,14 +201,10 @@ export default function ReportCreate() {
                 id="neutered"
                 className="border p-2 rounded"
                 {...register("patient.neutered")}
-                onChange={e => {
-                  const val = e.target.value;
-                  setValue("patient.neutered", val === "" ? undefined : val === "true");
-                }}
               >
-                <option value="">Desconocido</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
+                <option value="unknown">Desconocido</option>
+                <option value="neutered">Sí</option>
+                <option value="intact">No</option>
               </select>
             </div>
 
@@ -256,3 +252,4 @@ export default function ReportCreate() {
     </div>
   );
 }
+

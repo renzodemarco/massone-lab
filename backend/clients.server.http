@@ -10,9 +10,15 @@ Content-Type: application/json
     "veterinarians": []
 }
 
+
 ### GET CLIENTS
 
 GET http://localhost:8080/api/clients/
+
+
+### GET CLIENT BY ID
+GET http://localhost:8080/api/clients/68c2ac79093877decae19d2a
+
 
 ### PUT CLIENT
 PUT http://localhost:8080/api/clients/6887e6099456012b51943dc2

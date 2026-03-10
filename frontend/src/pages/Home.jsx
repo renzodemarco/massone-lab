@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Sidebar from "../sections/Sidebar";
 import Welcome from "../sections/Welcome";
 import Reports from "../sections/Reports";
@@ -7,8 +8,12 @@ import Clients from "../sections/Clients";
 
 function Home() {
 
-  const [view, setView] = useState("reports");
-  
+  const [searchParams] = useSearchParams();
+
+  const viewParam = searchParams.get("view");
+  const initialView = viewParam === "reports" || viewParam === "clients" ? viewParam : "welcome";
+  const [currentView, setCurrentView] = useState(initialView);
+
   const views = {
     welcome: <Welcome />,
     reports: <Reports />,
@@ -17,9 +22,9 @@ function Home() {
 
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
-      <Sidebar view={view} setView={setView} />
+      <Sidebar view={currentView} setView={setCurrentView} />
       <div className="flex-1 flex flex-col">
-        {views[view]}
+        {views[currentView]}
       </div>
     </div>
   );

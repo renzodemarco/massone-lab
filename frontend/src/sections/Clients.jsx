@@ -1,4 +1,4 @@
-import SearchBar from "./Searchbar";
+import SearchBar from "./SearchBar";
 import ClientsTable from "./ClientsTable"
 
 function Clients() {

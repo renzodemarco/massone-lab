@@ -87,7 +87,7 @@ export async function GETpdfReport(req, res, next) {
     const pdfBuffer = await reportsServices.generateReport(req.params.id);
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename=reporte-${req.params.id}.pdf`);
+    res.setHeader("Content-Disposition", `attachment; filename="${req.params.id}.pdf"`);
     res.send(pdfBuffer);
   }
   catch (e) {

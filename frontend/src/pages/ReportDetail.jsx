@@ -25,9 +25,9 @@ export default function ReportDetail() {
             species: data.patient.species || "",
             breed: data.patient.breed || "",
             age: data.patient.age || "",
-            sex: data.patient.sex || "macho",
+            sex: data.patient.sex || "unknown",
             color: data.patient.color || "",
-            neutered: data.patient.neutered || false,
+            neutered: data.patient.neutered || "unknown",
           },
           veterinarian: data.veterinarian || "",
           client: data.client._id || "",
@@ -53,7 +53,7 @@ export default function ReportDetail() {
       const { _id, ...cleanData } = formData;
       await updateReport(_id, cleanData);
       alert("Informe actualizado!");
-      navigate("/");
+      navigate("/?view=reports");
     } catch (err) {
       console.error(err);
       alert("Error al actualizar");
@@ -147,7 +147,7 @@ export default function ReportDetail() {
             <div>
               <label className="block mb-1 font-medium" htmlFor="sex">Sexo</label>
               <select {...register("patient.sex")} id="sex" className="border p-2 rounded">
-                <option value="">Desconocido</option>
+                <option value="unknown">Desconocido</option>
                 <option value="macho">Macho</option>
                 <option value="hembra">Hembra</option>
               </select>
@@ -159,14 +159,10 @@ export default function ReportDetail() {
                 id="neutered"
                 className="border p-2 rounded"
                 {...register("patient.neutered")}
-                onChange={e => {
-                  const val = e.target.value;
-                  setValue("patient.neutered", val === "" ? undefined : val === "true");
-                }}
               >
-                <option value="">Desconocido</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
+                <option value="unknown">Desconocido</option>
+                <option value="neutered">Sí</option>
+                <option value="intact">No</option>
               </select>
             </div>
 
@@ -214,3 +210,5 @@ export default function ReportDetail() {
     </div >
   );
 }
+
+

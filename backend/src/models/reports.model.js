@@ -25,16 +25,17 @@ const patientSchema = new mongoose.Schema(
     },
     sex: {
       type: String,
-      enum: ['macho', 'hembra'],
-      default: undefined 
+      enum: ['macho', 'hembra', 'unknown'],
+      default: 'unknown'
     },
     color: {
       type: String,
       trim: true
     },
     neutered: {
-      type: Boolean,
-      default: undefined
+      type: String,
+      enum: ['neutered', 'intact', 'unknown'],
+      default: 'unknown'
     }
   },
   { _id: false }

@@ -6,7 +6,29 @@ export async function getClients() {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message)
-    return e
+    console.error(e.message);
+    throw e;
+  }
+}
+
+export async function getClientById(id) {
+  try {
+    const res = await api.get(`/clients/${id}`);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.message);
+    throw e;
+  }
+}
+
+export async function updateClient(id, data) {
+  try {
+    const res = await api.put(`/clients/${id}`, data);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.message);
+    throw e;
   }
 }

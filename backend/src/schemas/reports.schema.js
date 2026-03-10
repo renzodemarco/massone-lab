@@ -10,9 +10,9 @@ export const createReportSchema = Joi.object({
     species: Joi.string().trim().optional().allow(''),
     breed: Joi.string().trim().optional().allow(''),
     age: Joi.string().trim().optional().allow(''),
-    sex: Joi.string().valid('macho', 'hembra').required(),
+    sex: Joi.string().valid('macho', 'hembra', 'unknown').required(),
     color: Joi.string().trim().optional().allow(''),
-    neutered: Joi.boolean().optional()
+    neutered: Joi.string().valid('neutered', 'intact', 'unknown').optional()
   }).required(),
 
   veterinarian: Joi.string().trim().optional().allow(''),
@@ -48,9 +48,9 @@ export const updateReportSchema = Joi.object({
     species: Joi.string().trim().optional().allow(''),
     breed: Joi.string().trim().optional().allow(''),
     age: Joi.string().trim().optional().allow(''),
-    sex: Joi.string().valid('macho', 'hembra').optional(),
+    sex: Joi.string().valid('macho', 'hembra', 'unknown').optional(),
     color: Joi.string().trim().optional().allow(''),
-    neutered: Joi.boolean().optional()
+    neutered: Joi.string().valid('neutered', 'intact', 'unknown').optional()
   }).optional(),
 
   veterinarian: Joi.string().trim().optional().allow(''),

@@ -23,6 +23,17 @@ export async function GETAllClients(req, res, next) {
   }
 }
 
+export async function GETClientById(req, res, next) {
+  try {
+    const { id } = req.params;
+    const client = await clientsServices.getClientById(id);
+    res.status(200).json({ success: true, payload: client });
+  }
+  catch (e) {
+    next(e);
+  }
+}
+
 export async function PUTClient(req, res, next) {
   try {
     const { id } = req.params;

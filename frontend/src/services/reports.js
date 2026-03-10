@@ -59,7 +59,8 @@ export async function updateReport(id, data) {
   try {
     const res = await api.put(`/reports/${id}`, data);
     return res.data.payload;
-  } catch (e) {
+  }
+  catch (e) {
     console.error(e.response.data);
     throw e;
   }
