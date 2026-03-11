@@ -101,10 +101,11 @@ export default function ReportCreate() {
                 <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
                 <input
                   type="date"
-                  {...register("entryDate")}
+                  {...register("entryDate", { required: "La fecha de entrada es obligatoria" })}
                   id="entryDate"
                   className="border p-2 rounded"
                 />
+                <FormError message={errors.entryDate?.message} />
               </div>
 
               <div>

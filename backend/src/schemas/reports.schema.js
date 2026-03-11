@@ -35,7 +35,7 @@ export const createReportSchema = Joi.object({
   images: Joi.array().items(Joi.string().trim()).optional(),
 
   dueDate: Joi.date().optional(),
-  entryDate: Joi.date().optional()
+  entryDate: Joi.date().max('now').required()
 });
 
 export const updateReportSchema = Joi.object({
@@ -72,7 +72,7 @@ export const updateReportSchema = Joi.object({
 
   images: Joi.array().items(Joi.string().trim()).optional(),
 
-  entryDate: Joi.date().optional(),
+  entryDate: Joi.date().max('now').optional(),
   dueDate: Joi.date().optional()
 });
 
