@@ -85,6 +85,16 @@ export default function ReportDetail() {
             </div>
 
             <div>
+              <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
+              <input
+                type="date"
+                {...register("entryDate")}
+                id="entryDate"
+                className="border p-2 rounded"
+              />
+            </div>
+
+            <div>
               <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
               <select {...register("client")} id="client" className="border p-2 rounded" >
                 {clients.map(client => (

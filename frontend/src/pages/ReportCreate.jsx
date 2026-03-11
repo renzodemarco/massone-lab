@@ -21,11 +21,12 @@ export default function ReportCreate() {
   }, []);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    defaultValues: {
-      protocolNumber: "",
-      status: "entered",
-      patient: {
-        owner: "",
+      defaultValues: {
+        protocolNumber: "",
+        status: "entered",
+        entryDate: new Date().toISOString().split("T")[0],
+        patient: {
+          owner: "",
         name: "",
         species: "",
         breed: "",
@@ -38,12 +39,12 @@ export default function ReportCreate() {
       client: "",
       studyType: "cito",
       sampleInfo: "",
-      macroDescription: "",
-      microDescription: "",
-      comments: "",
-      result: "",
-    },
-  });
+        macroDescription: "",
+        microDescription: "",
+        comments: "",
+        result: "",
+      },
+    });
 
   useEffect(() => {
     getNextReportNumber().then(next => setValue("protocolNumber", next));
@@ -81,26 +82,36 @@ export default function ReportCreate() {
               <FormError message={errors.protocolNumber?.message} />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
-              <select
-                {...register("status")}
-                id="status"
-                className="border p-2 rounded"
-              >
-                <option value="entered">Ingresado</option>
-                <option value="started">Iniciado</option>
-                <option value="finished">Finalizado</option>
-                <option value="sent">Enviado</option>
-                <option value="cancelled">Cancelado</option>
-              </select>
-            </div>
+              <div>
+                <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
+                <select
+                  {...register("status")}
+                  id="status"
+                  className="border p-2 rounded"
+                >
+                  <option value="entered">Ingresado</option>
+                  <option value="started">Iniciado</option>
+                  <option value="finished">Finalizado</option>
+                  <option value="sent">Enviado</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-              <select
-                {...register("client", { required: "El cliente es obligatorio" })}
-                id="client"
+              <div>
+                <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
+                <input
+                  type="date"
+                  {...register("entryDate")}
+                  id="entryDate"
+                  className="border p-2 rounded"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
+                <select
+                  {...register("client", { required: "El cliente es obligatorio" })}
+                  id="client"
                 className="border p-2 rounded"
               >
                 <option value="">Seleccione</option>
