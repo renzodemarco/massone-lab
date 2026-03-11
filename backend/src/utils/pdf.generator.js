@@ -162,7 +162,7 @@ export const generateCitoPDF = data => {
       const neuteredLabel =
         data.patient.neutered === "neutered"
           ? "SÃ­"
-          : data.patient.neutered === "intact"
+          : data.patient.neutered === "entire"
             ? "No"
             : "Desconocido";
 
@@ -262,3 +262,4 @@ export const generateCitoPDF = data => {
     }
   });
 };
+

@@ -215,7 +215,7 @@ export default function ReportCreate() {
               >
                 <option value="unknown">Desconocido</option>
                 <option value="neutered">Sí</option>
-                <option value="intact">No</option>
+                <option value="entire">No</option>
               </select>
             </div>
 
@@ -263,4 +263,5 @@ export default function ReportCreate() {
     </div>
   );
 }
+
 

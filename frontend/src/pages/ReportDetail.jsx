@@ -172,7 +172,7 @@ export default function ReportDetail() {
               >
                 <option value="unknown">Desconocido</option>
                 <option value="neutered">Sí</option>
-                <option value="intact">No</option>
+                <option value="entire">No</option>
               </select>
             </div>
 
@@ -220,5 +220,6 @@ export default function ReportDetail() {
     </div >
   );
 }
+
 
 

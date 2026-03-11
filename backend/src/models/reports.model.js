@@ -34,7 +34,7 @@ const patientSchema = new mongoose.Schema(
     },
     neutered: {
       type: String,
-      enum: ['neutered', 'intact', 'unknown'],
+      enum: ['neutered', 'entire', 'unknown'],
       default: 'unknown'
     }
   },
@@ -129,3 +129,4 @@ reportSchema.plugin(mongoosePaginate);
 const ReportModel = mongoose.model('Report', reportSchema);
 
 export default ReportModel;
+

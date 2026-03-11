@@ -12,7 +12,7 @@ export const createReportSchema = Joi.object({
     age: Joi.string().trim().optional().allow(''),
     sex: Joi.string().valid('macho', 'hembra', 'unknown').required(),
     color: Joi.string().trim().optional().allow(''),
-    neutered: Joi.string().valid('neutered', 'intact', 'unknown').optional()
+    neutered: Joi.string().valid('neutered', 'entire', 'unknown').optional()
   }).required(),
 
   veterinarian: Joi.string().trim().optional().allow(''),
@@ -50,7 +50,7 @@ export const updateReportSchema = Joi.object({
     age: Joi.string().trim().optional().allow(''),
     sex: Joi.string().valid('macho', 'hembra', 'unknown').optional(),
     color: Joi.string().trim().optional().allow(''),
-    neutered: Joi.string().valid('neutered', 'intact', 'unknown').optional()
+    neutered: Joi.string().valid('neutered', 'entire', 'unknown').optional()
   }).optional(),
 
   veterinarian: Joi.string().trim().optional().allow(''),
@@ -75,3 +75,4 @@ export const updateReportSchema = Joi.object({
   entryDate: Joi.date().optional(),
   dueDate: Joi.date().optional()
 });
+
