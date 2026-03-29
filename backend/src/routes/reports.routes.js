@@ -10,7 +10,7 @@ router.post("/", middlewares.validateClient, reportsControllers.POSTReport)
 .get("/number/last", reportsControllers.GETLastReportNumber)
 .get("/number/:n", reportsControllers.GETReportByNumber)
 .get("/pdf/:id", reportsControllers.GETpdfReport)
-.put("/:id", reportsControllers.PUTReport)
+.put("/:id", middlewares.validateClient, reportsControllers.PUTReport)
 .delete("/:id", reportsControllers.DELETEReport);
 
 export default router;

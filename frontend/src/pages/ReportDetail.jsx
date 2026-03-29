@@ -4,18 +4,21 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getReportByNumber, updateReport } from "../services/reports";
 import { getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
-
+import FormError from "../components/FormError";
+import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportDetail() {
 
   const { n } = useParams();
+  const [reportId, setReportId] = useState(null);
   const [clients, setClients] = useState([]);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     getReportByNumber(n)
       .then((data) => {
+        setReportId(data._id);
         reset({
           protocolNumber: data.protocolNumber,
           status: data.status,
@@ -37,9 +40,7 @@ export default function ReportDetail() {
           microDescription: data.microDescription || "",
           comments: data.comments || "",
           result: data.result || "",
-          entryDate: data.entryDate?.split("T")[0] || "",
-          dueDate: data.dueDate?.split("T")[0] || "",
-          _id: data._id
+          entryDate: data.entryDate?.split("T")[0] || ""
         });
       })
       .catch(console.error);
@@ -50,8 +51,7 @@ export default function ReportDetail() {
 
   const onSubmit = async (formData) => {
     try {
-      const { _id, ...cleanData } = formData;
-      await updateReport(_id, cleanData);
+      await updateReport(reportId, formData);
       alert("Informe actualizado!");
       navigate("/?view=reports");
     } catch (err) {
@@ -59,6 +59,10 @@ export default function ReportDetail() {
       alert("Error al actualizar");
     }
   };
+
+  const entryDate = watch("entryDate");
+  const studyType = watch("studyType");
+  const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
@@ -88,10 +92,16 @@ export default function ReportDetail() {
               <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
               <input
                 type="date"
-                {...register("entryDate")}
+                {...register("entryDate", { required: "La fecha de entrada es obligatoria" })}
                 id="entryDate"
                 className="border p-2 rounded"
               />
+              {dueDate && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Entrega estimada: {dueDate.toLocaleDateString("es-AR")}
+                </p>
+              )}
+              <FormError message={errors.entryDate?.message} />
             </div>
 
             <div>

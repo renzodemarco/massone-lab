@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClients } from "../services/clients";
 import { postReport } from "../services/reports";
@@ -7,7 +7,7 @@ import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
-
+import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
@@ -21,12 +21,12 @@ export default function ReportCreate() {
   }, []);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-      defaultValues: {
-        protocolNumber: "",
-        status: "entered",
-        entryDate: new Date().toISOString().split("T")[0],
-        patient: {
-          owner: "",
+    defaultValues: {
+      protocolNumber: "",
+      status: "entered",
+      entryDate: new Date().toISOString().split("T")[0],
+      patient: {
+        owner: "",
         name: "",
         species: "",
         breed: "",
@@ -39,12 +39,12 @@ export default function ReportCreate() {
       client: "",
       studyType: "cito",
       sampleInfo: "",
-        macroDescription: "",
-        microDescription: "",
-        comments: "",
-        result: "",
-      },
-    });
+      macroDescription: "",
+      microDescription: "",
+      comments: "",
+      result: "",
+    },
+  });
 
   useEffect(() => {
     getNextReportNumber().then(next => setValue("protocolNumber", next));
@@ -64,6 +64,10 @@ export default function ReportCreate() {
     }
   };
 
+  const entryDate = watch("entryDate");
+  const studyType = watch("studyType");
+  const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
+
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
       <Sidebar back={true} />
@@ -82,37 +86,42 @@ export default function ReportCreate() {
               <FormError message={errors.protocolNumber?.message} />
             </div>
 
-              <div>
-                <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
-                <select
-                  {...register("status")}
-                  id="status"
-                  className="border p-2 rounded"
-                >
-                  <option value="entered">Ingresado</option>
-                  <option value="started">Iniciado</option>
-                  <option value="finished">Finalizado</option>
-                  <option value="sent">Enviado</option>
-                  <option value="cancelled">Cancelado</option>
-                </select>
-              </div>
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
+              <select
+                {...register("status")}
+                id="status"
+                className="border p-2 rounded"
+              >
+                <option value="entered">Ingresado</option>
+                <option value="started">Iniciado</option>
+                <option value="finished">Finalizado</option>
+                <option value="sent">Enviado</option>
+                <option value="cancelled">Cancelado</option>
+              </select>
+            </div>
 
-              <div>
-                <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
-                <input
-                  type="date"
-                  {...register("entryDate", { required: "La fecha de entrada es obligatoria" })}
-                  id="entryDate"
-                  className="border p-2 rounded"
-                />
-                <FormError message={errors.entryDate?.message} />
-              </div>
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="entryDate">Fecha de Entrada</label>
+              <input
+                type="date"
+                {...register("entryDate", { required: "La fecha de entrada es obligatoria" })}
+                id="entryDate"
+                className="border p-2 rounded"
+              />
+              {dueDate && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Entrega estimada: {dueDate.toLocaleDateString("es-AR")}
+                </p>
+              )}
+              <FormError message={errors.entryDate?.message} />
+            </div>
 
-              <div>
-                <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-                <select
-                  {...register("client", { required: "El cliente es obligatorio" })}
-                  id="client"
+            <div>
+              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
+              <select
+                {...register("client", { required: "El cliente es obligatorio" })}
+                id="client"
                 className="border p-2 rounded"
               >
                 <option value="">Seleccione</option>

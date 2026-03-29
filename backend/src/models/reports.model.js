@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import { calculateDueDate } from "../utils/calculateDueDate.js";
 
 const patientSchema = new mongoose.Schema(
   {
@@ -113,13 +114,7 @@ const reportSchema = new mongoose.Schema(
 
 reportSchema.pre('save', function (next) {
   if (!this.dueDate && this.entryDate && this.studyType) {
-    const daysToAdd = {
-      cito: 3,
-      hp: 7,
-      ihq: 10
-    }[this.studyType] || 7;
-
-    this.dueDate = new Date(this.entryDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+    this.dueDate = calculateDueDate(this.entryDate, this.studyType);
   }
   next();
 });

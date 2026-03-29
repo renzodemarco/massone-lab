@@ -2,6 +2,7 @@ import ReportsModel from '../models/reports.model.js';
 import * as pdf from '../utils/pdf.generator.js'
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
+import { calculateDueDate } from '../utils/calculateDueDate.js';
 
 export async function createReport(data) {
   const existing = await ReportsModel.findOne({ protocolNumber: data.protocolNumber }).lean();
@@ -33,11 +34,30 @@ export async function getLastReportNumber() {
 }
 
 export async function updateReport(id, data) {
+  const existing = await ReportsModel.findById(id);
+  if (!existing) CustomError.new(dictionary.reportNotFound);
+
+  const finalEntryDate = data.entryDate ?? existing.entryDate;
+  const finalStudyType = data.studyType ?? existing.studyType;
+
+  if (data.entryDate || data.studyType) {
+    data.dueDate = calculateDueDate(finalEntryDate, finalStudyType);
+  }
+
+  if (data.protocolNumber) {
+    const existingProtocol = await ReportsModel.findOne({
+      _id: { $ne: id },
+      protocolNumber: data.protocolNumber
+    }).lean();
+
+    if (existingProtocol) CustomError.new(dictionary.protocolNumberExists);
+  }
+
   const report = await ReportsModel.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true
   });
-  if (!report) CustomError.new(dictionary.reportNotFound);
+
   return report;
 }
 

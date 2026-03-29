@@ -6,7 +6,7 @@ export async function getClients() {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message);
+    console.error(e.response?.data ?? e.message ?? e)
     throw e;
   }
 }
@@ -17,7 +17,7 @@ export async function getClientById(id) {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message);
+    console.error(e.response?.data ?? e.message ?? e)
     throw e;
   }
 }
@@ -28,7 +28,7 @@ export async function updateClient(id, data) {
     return res.data.payload;
   }
   catch (e) {
-    console.error(e.message);
+    console.error(e.response?.data ?? e.message ?? e)
     throw e;
   }
 }

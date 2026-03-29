@@ -19,6 +19,10 @@ export const dictionary = {
     status: 409,
     message: "Protocol number already exists"
   },
+  invalidQuery: {
+    status: 400,
+    message: "Invalid query format"
+  },
   authentication: {
     status: 401,
     message: "Not authenticated"
