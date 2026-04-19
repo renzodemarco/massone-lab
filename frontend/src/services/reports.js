@@ -11,9 +11,15 @@ export async function postReport(data) {
   }
 }
 
-export async function getReports() {
+export async function getReports(searchParams = {}) {
   try {
-    const res = await api.get("/reports");
+    const params = {};
+
+    if (searchParams.q) params.q = searchParams.q;
+    if (searchParams.field && searchParams.q) params.field = searchParams.field;
+    if (searchParams.status) params.status = searchParams.status;
+
+    const res = await api.get("/reports", { params });
     return res.data.payload;
   }
   catch (e) {

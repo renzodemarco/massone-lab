@@ -15,7 +15,10 @@ export async function POSTClient(req, res, next) {
 
 export async function GETAllClients(req, res, next) {
   try {
-    const clients = await clientsServices.getAllClients();
+    const q = req.query.q?.trim();
+    const clients = q
+      ? await clientsServices.getClientsByName(q)
+      : await clientsServices.getAllClients();
     return res.status(200).json({ success: true, payload: clients });
   }
   catch (e) {

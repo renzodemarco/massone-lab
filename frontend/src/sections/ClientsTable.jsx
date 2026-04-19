@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClients } from "../services/clients";
 
-export default function ClientsTable() {
+export default function ClientsTable({ query }) {
 
   const [data, setData] = useState([])
   const navigate = useNavigate();
 
   useEffect(() => {
-    getClients().then(setData).catch(console.error);
-  }, []);
+    getClients(query).then(setData).catch(console.error);
+  }, [query]);
 
   return (
     <div className="overflow-hidden rounded-lg border border-[#dce0e5] bg-white">

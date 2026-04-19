@@ -1,8 +1,10 @@
 import api from "./api";
 
-export async function getClients() {
+export async function getClients(query = "") {
   try {
-    const res = await api.get("/clients");
+    const res = await api.get("/clients", {
+      params: query ? { q: query } : {}
+    });
     return res.data.payload;
   }
   catch (e) {
