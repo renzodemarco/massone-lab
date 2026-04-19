@@ -1,4 +1,5 @@
 import ClientsModel from '../models/clients.model.js';
+import ReportsModel from '../models/reports.model.js';
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
 
@@ -49,6 +50,8 @@ export async function updateClient(id, data) {
 }
 
 export async function deleteClient(id) {
+  const linkedReport = await ReportsModel.exists({ client: id });
+  if (linkedReport) CustomError.new(dictionary.clientHasReports);
   const client = await ClientsModel.findByIdAndDelete(id);
   if (!client) CustomError.new(dictionary.clientNotFound);
   return client;

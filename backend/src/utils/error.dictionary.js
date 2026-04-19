@@ -11,6 +11,10 @@ export const dictionary = {
     status: 400,
     message: "Client is required"
   },
+  clientHasReports: {
+    status: 409,
+    message: "Client cannot be deleted because it has associated reports"
+  },
   reportNotFound: {
     status: 404,
     message: "Report not found"
