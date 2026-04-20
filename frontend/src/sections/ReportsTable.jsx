@@ -41,7 +41,6 @@ export default function ReportsTable({ searchParams }) {
   };
 
   const handlePDF = async (id) => {
-
     try {
       await generatePDF(id);
     } catch (err) {
