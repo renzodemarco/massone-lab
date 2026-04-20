@@ -33,7 +33,7 @@ export default function ReportDetail() {
             neutered: data.patient.neutered || "unknown",
           },
           veterinarian: data.veterinarian || "",
-          client: data.client._id || "",
+          client: data.client?._id || "",
           studyType: data.studyType || "cito",
           sampleInfo: data.sampleInfo || "",
           macroDescription: data.macroDescription || "",
@@ -62,6 +62,7 @@ export default function ReportDetail() {
 
   const entryDate = watch("entryDate");
   const studyType = watch("studyType");
+  const selectedClient = watch("client");
   const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
@@ -107,6 +108,12 @@ export default function ReportDetail() {
             <div>
               <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
               <select {...register("client")} id="client" className="border p-2 rounded" >
+                {!clients.some(client => client._id === selectedClient) && selectedClient && (
+                  <option value={selectedClient}>Cliente eliminado</option>
+                )}
+                {!selectedClient && (
+                  <option value="">Seleccione un cliente</option>
+                )}
                 {clients.map(client => (
                   <option key={client._id} value={client._id}>
                     {client.name}

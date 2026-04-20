@@ -3,7 +3,7 @@ import { getReports } from "../services/reports";
 import { useNavigate } from "react-router-dom";
 import { destroyReport, generatePDF } from "../services/reports";
 
-export default function ReportsTable() {
+export default function ReportsTable({ searchParams }) {
 
   const [data, setData] = useState({ docs: [] })
   const navigate = useNavigate();
@@ -20,8 +20,8 @@ export default function ReportsTable() {
   };
 
   useEffect(() => {
-    getReports().then(setData).catch(console.error);
-  }, []);
+    getReports(searchParams).then(setData).catch(console.error);
+  }, [searchParams]);
 
   const handleDelete = async (id, protocolNumber) => {
     const ok = window.confirm(`¿Seguro que querés eliminar el informe ${protocolNumber}?`);

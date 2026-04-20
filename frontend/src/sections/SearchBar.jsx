@@ -1,15 +1,50 @@
+export default function SearchBar({
+  placeholder,
+  value,
+  onChange,
+  buttonLabel = "Buscar",
+  onSubmit,
+  onClear,
+  canClear = false,
+  filters = null,
+  children = null
+}) {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSubmit?.();
+  };
 
-export default function SearchBar({ placeholder }) {
   return (
-    <label className="flex flex-col w-full h-12">
-      <div className="flex w-full h-full items-stretch rounded-lg">
-        <div className="flex items-center justify-center pl-4 bg-[#f0f2f4] rounded-l-lg border-r-0 text-[#637588]">
-        </div>
-        <input
-          placeholder={placeholder}
-          className="flex-1 px-4 rounded-l-none border-none bg-[#f0f2f4] text-[#111418] placeholder-[#637588] focus:outline-none"
-        />
+    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+      {filters}
+      <div className="flex h-12 items-stretch gap-3">
+        <label className="flex-1">
+          <input
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            className="h-full w-full rounded-lg border-none bg-[#f0f2f4] px-4 text-[#111418] placeholder-[#637588] focus:outline-none"
+          />
+        </label>
+        {canClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="rounded-lg bg-[#f0f2f4] px-4 text-[#637588] transition font-semibold"
+            aria-label="Limpiar búsqueda"
+            title="Limpiar búsqueda"
+          >
+            X
+          </button>
+        )}
+        {children}
+        <button
+          type="submit"
+          className="rounded-lg bg-[#632b91] px-6 text-white transition font-semibold link-button"
+        >
+          {buttonLabel}
+        </button>
       </div>
-    </label>
+    </form>
   );
 }

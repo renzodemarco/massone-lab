@@ -30,4 +30,4 @@ Content-Type: application/json
 
 ### DELETE CLIENT
 
-DELETE http://localhost:8080/api/clients/68b60b84219ddcbd20d0eda2
+DELETE http://localhost:8080/api/clients/68c2ac79093877decae19d2a

@@ -1,6 +1,11 @@
 import ClientsModel from '../models/clients.model.js';
+import ReportsModel from '../models/reports.model.js';
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export async function createClient(data) {
   const existing = await ClientsModel.findOne({
@@ -24,8 +29,9 @@ export async function getClientById(id) {
 }
 
 export async function getClientsByName(name) {
+  const escapedName = escapeRegex(name);
   return await ClientsModel.find({
-    name: { $regex: name, $options: 'i' }
+    name: { $regex: escapedName, $options: 'i' }
   });
 }
 
@@ -49,6 +55,8 @@ export async function updateClient(id, data) {
 }
 
 export async function deleteClient(id) {
+  const linkedReport = await ReportsModel.exists({ client: id });
+  if (linkedReport) CustomError.new(dictionary.clientHasReports);
   const client = await ClientsModel.findByIdAndDelete(id);
   if (!client) CustomError.new(dictionary.clientNotFound);
   return client;

@@ -15,12 +15,19 @@ export async function POSTReport(req, res, next) {
 
 export async function GETReports(req, res, next) {
   try {
-    let { page = 1, limit = 20, ...filters } = req.query;
+    let { page = 1, limit = 20, field, q, status, ...filters } = req.query;
     page = Number(page);
     limit = Number(limit);
     if (isNaN(page) || page < 1) page = 1;
     if (isNaN(limit) || limit < 1) limit = 20;
-    const reports = await reportsServices.getReports({ ...filters, page, limit });
+    const reports = await reportsServices.getReports({
+      ...filters,
+      field: field?.trim(),
+      q: q?.trim(),
+      status: status?.trim(),
+      page,
+      limit
+    });
     return res.status(200).json({ success: true, payload: reports })
   }
   catch (e) {
