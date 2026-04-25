@@ -4,9 +4,30 @@ import * as pdf from '../utils/pdf.generator.js'
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
 import { calculateDueDate } from '../utils/calculateDueDate.js';
+import cloudinary from '../config/cloudinary.config.js';
+import mongoose from 'mongoose';
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function uploadFileToCloudinary(file, reportId) {
+  const options = {
+    folder: `massone-lab/reports/${reportId}`,
+    resource_type: "image"
+  };
+
+  if (file.path) {
+    return await cloudinary.uploader.upload(file.path, options);
+  }
+
+  if (file.buffer) {
+    const base64 = file.buffer.toString("base64");
+    const dataUri = `data:${file.mimetype};base64,${base64}`;
+    return await cloudinary.uploader.upload(dataUri, options);
+  }
+
+  CustomError.new(dictionary.reportImageUploadFailed);
 }
 
 export async function createReport(data) {
@@ -87,6 +108,33 @@ export async function updateReport(id, data) {
   });
 
   return report;
+}
+
+export async function uploadReportImages(id, files = []) {
+  const report = await ReportsModel.findById(id);
+  if (!report) CustomError.new(dictionary.reportNotFound);
+  if (!files.length) CustomError.new(dictionary.reportImagesRequired);
+
+  try {
+    const uploads = await Promise.all(
+      files.map(async (file) => {
+        const uploaded = await uploadFileToCloudinary(file, report._id);
+
+        return {
+          _id: new mongoose.Types.ObjectId(),
+          secureUrl: uploaded.secure_url,
+          publicId: uploaded.public_id
+        };
+      })
+    );
+
+    report.images.push(...uploads);
+    await report.save();
+    return report.images;
+  } catch (error) {
+    if (error.status) throw error;
+    CustomError.new(dictionary.reportImageUploadFailed);
+  }
 }
 
 export async function deleteReport(id) {

@@ -19,6 +19,14 @@ export const dictionary = {
     status: 404,
     message: "Report not found"
   },
+  reportImagesRequired: {
+    status: 400,
+    message: "At least one image file is required"
+  },
+  reportImageUploadFailed: {
+    status: 500,
+    message: "Report image upload failed"
+  },
   protocolNumberExists: {
     status: 409,
     message: "Protocol number already exists"

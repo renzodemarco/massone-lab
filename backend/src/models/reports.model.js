@@ -95,8 +95,15 @@ const reportSchema = new mongoose.Schema(
     },
     images: [
       {
-        type: String,
-        trim: true
+        _id: mongoose.Schema.ObjectId,
+        secureUrl: {
+          type: String,
+          trim: true
+        },
+        publicId: {
+          type: String,
+          trim: true
+        }
       }
     ],
     entryDate: {
