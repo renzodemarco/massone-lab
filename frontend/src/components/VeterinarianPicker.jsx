@@ -22,7 +22,7 @@ export default function VeterinarianPicker({
     }
 
     if (value) {
-      setQuery("Veterinario eliminado");
+      setQuery("Veterinario no encontrado");
       return;
     }
 
@@ -81,7 +81,7 @@ export default function VeterinarianPicker({
           placeholder={disabled ? "Seleccione un cliente primero" : placeholder}
           autoComplete="off"
           disabled={disabled}
-          className="w-full rounded border p-2 pr-10 disabled:cursor-not-allowed disabled:bg-[#f5f5f5]"
+          className="w-full rounded border p-2 pr-10 disabled:bg-[#f5f5f5]"
         />
         {query && !disabled && (
           <button

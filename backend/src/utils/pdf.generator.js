@@ -1,6 +1,37 @@
 import PDFDocument from "pdfkit";
 
-export const generateCitoPDF = data => {
+const LABELS = {
+  species: {
+    canine: "Canino",
+    feline: "Felino",
+    equine: "Equino",
+    bovine: "Bovino",
+    porcine: "Porcino",
+    other: "Otro"
+  },
+  sex: {
+    macho: "Macho",
+    hembra: "Hembra",
+    unknown: "Desconocido"
+  },
+  neutered: {
+    neutered: "Sí",
+    entire: "No",
+    unknown: "Desconocido"
+  }
+};
+
+function normalizeValue(value, fallback = "-") {
+  if (value === null || value === undefined) return fallback;
+  const normalized = String(value).trim();
+  return normalized || fallback;
+}
+
+function translateValue(group, value, fallback = "-") {
+  return LABELS[group]?.[value] || normalizeValue(value, fallback);
+}
+
+export const generateCitoPDF = (data) => {
   return new Promise((resolve, reject) => {
     try {
       const buffers = [];
@@ -9,7 +40,6 @@ export const generateCitoPDF = data => {
         margins: { top: 50, left: 50, right: 50, bottom: 50 }
       });
 
-
       doc.on("data", buffers.push.bind(buffers));
       doc.on("end", () => resolve(Buffer.concat(buffers)));
 
@@ -17,7 +47,11 @@ export const generateCitoPDF = data => {
       doc.registerFont("Calibri-Bold", "public/fonts/Calibri-Bold.ttf");
       doc.registerFont("Calibri-Italic", "public/fonts/Calibri-Italic.ttf");
 
-      // --- ENCABEZADO ---
+      const formattedDate = new Date(data.entryDate).toLocaleDateString("es-AR");
+      const sexLabel = translateValue("sex", data.patient?.sex);
+      const neuteredLabel = translateValue("neutered", data.patient?.neutered);
+      const speciesLabel = translateValue("species", data.patient?.species);
+
       doc.image("public/images/logo.png", 400, 20, { fit: [150, 80], align: "right" });
 
       doc
@@ -36,9 +70,7 @@ export const generateCitoPDF = data => {
         .fontSize(11)
         .fillColor("#000")
         .font("Calibri-Bold")
-        .text(`Protocolo número: ${data.protocolNumber}`, 50, 100);
-
-      const formattedDate = new Date(data.entryDate).toLocaleDateString("es-AR");
+        .text(`Protocolo número: ${normalizeValue(data.protocolNumber)}`, 50, 100);
 
       doc
         .fontSize(11)
@@ -55,7 +87,7 @@ export const generateCitoPDF = data => {
         .font("Calibri-Italic")
         .fontSize(12)
         .fillColor("#000")
-        .text("“Ninguna cadena es más fuerte que el más débil de sus eslabones.”", 0, 140, {
+        .text('"Ninguna cadena es más fuerte que el más débil de sus eslabones."', 0, 140, {
           align: "center",
           width: doc.page.width
         });
@@ -69,7 +101,7 @@ export const generateCitoPDF = data => {
       doc
         .font("Calibri")
         .fillColor("#000")
-        .text(`${data.veterinarian}`, 152, 170);
+        .text(normalizeValue(data.veterinarian), 152, 170);
 
       doc.moveTo(50, 195).lineTo(550, 195).strokeColor("#632b91").lineWidth(0.2).stroke();
 
@@ -82,7 +114,7 @@ export const generateCitoPDF = data => {
       doc
         .font("Calibri")
         .fillColor("#000")
-        .text(`${data.patient.owner}`, 218, 215);
+        .text(normalizeValue(data.patient?.owner), 218, 215);
 
       doc.moveTo(50, 240).lineTo(550, 240).strokeColor("#632b91").lineWidth(0.2).stroke();
 
@@ -102,7 +134,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(14)
         .fillColor("#000")
-        .text(`${data.patient.name}`, 356, 260);
+        .text(normalizeValue(data.patient?.name), 356, 260);
 
       doc
         .font("Calibri-Bold")
@@ -114,7 +146,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.species}`, 96, 280);
+        .text(speciesLabel, 96, 280);
 
       doc
         .font("Calibri-Bold")
@@ -126,7 +158,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.breed}`, 331, 280);
+        .text(normalizeValue(data.patient?.breed), 331, 280);
 
       doc
         .font("Calibri-Bold")
@@ -138,7 +170,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.age}`, 83, 296);
+        .text(normalizeValue(data.patient?.age), 83, 296);
 
       doc
         .font("Calibri-Bold")
@@ -150,7 +182,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${data.patient.color}`, 335, 296);
+        .text(normalizeValue(data.patient?.color), 335, 296);
 
       doc
         .font("Calibri-Bold")
@@ -158,19 +190,11 @@ export const generateCitoPDF = data => {
         .fillColor("#000")
         .text("Sexo:", 50, 312);
 
-      const sexLabel = data.patient.sex === "unknown" ? "Desconocido" : data.patient.sex;
-      const neuteredLabel =
-        data.patient.neutered === "neutered"
-          ? "SÃ­"
-          : data.patient.neutered === "entire"
-            ? "No"
-            : "Desconocido";
-
       doc
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${sexLabel}`, 81, 312);
+        .text(sexLabel, 81, 312);
 
       doc
         .font("Calibri-Bold")
@@ -182,7 +206,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(12)
         .fillColor("#000")
-        .text(`${neuteredLabel}`, 352, 312);
+        .text(neuteredLabel, 352, 312);
 
       doc.moveTo(50, 335).lineTo(550, 335).strokeColor("#632b91").lineWidth(0.2).stroke();
 
@@ -201,7 +225,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(14)
         .fillColor("#000")
-        .text(`${data.macroDescription}`, 60);
+        .text(normalizeValue(data.macroDescription), 60);
 
       doc.y += 16;
 
@@ -217,7 +241,7 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(14)
         .fillColor("#000")
-        .text(`${data.microDescription}`, 60);
+        .text(normalizeValue(data.microDescription), 60);
 
       doc.y += 16;
 
@@ -233,28 +257,9 @@ export const generateCitoPDF = data => {
         .font("Calibri")
         .fontSize(14)
         .fillColor("#000")
-        .text(`${data.result}`, 60);
+        .text(normalizeValue(data.result), 60);
 
-        doc.y += 30;
-
-
-      // doc.fontSize(14).font("Calibri-Bold").fillColor("#632b91").text("Paciente", { underline: true });
-      // doc.fontSize(12).font("Calibri").fillColor("black");
-      // doc.text(`Nombre: ${data.patient.name}`);
-      // doc.text(`Tutor: ${data.patient.owner}`);
-      // doc.text(`Especie: ${data.patient.species}`);
-      // doc.text(`Raza: ${data.patient.breed}`);
-      // doc.text(`Edad: ${data.patient.age}`);
-      // doc.text(`Sexo: ${data.patient.sex}`);
-      // doc.text(`Color: ${data.patient.color}`);
-      // doc.text(`Castrado: ${data.patient.neutered ? "Sí" : "No"}`);
-      // doc.moveDown();
-
-      // if (data.result) {
-      //   doc.fontSize(14).fillColor("#632b91").font("Calibri-Bold").text("Diagnóstico", { underline: true });
-      //   doc.fontSize(12).fillColor("black").font("Calibri").text(data.result, { align: "justify" });
-      //   doc.moveDown();
-      // }
+      doc.y += 30;
 
       doc.end();
     } catch (err) {
@@ -262,4 +267,3 @@ export const generateCitoPDF = data => {
     }
   });
 };
-

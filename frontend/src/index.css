@@ -52,14 +52,14 @@ a:hover {
   border: solid 2px transparent;
 }
 
-.link-button:hover {
+.link-button:not(:disabled):hover {
   background-color: rgba(99, 43, 145, .05);
   color: var(--color-primary);
   border-color: var(--color-primary);
   cursor: pointer;
 }
 
-.delete-button:hover {
+.delete-button:not(:disabled):hover {
   background-color: rgba(99, 43, 145, .05);
   color: var(--color-secondary);
   border-color: var(--color-secondary);

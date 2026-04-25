@@ -18,7 +18,7 @@ export default function Pagination({ page, totalPages, onPageChange }) {
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
       <button
         type="button"
-        className="link-button rounded-lg border border-[#dce0e5] bg-white px-3 py-2 text-sm font-semibold text-[#111418] disabled:cursor-not-allowed disabled:opacity-50"
+        className="link-button rounded-lg border border-[#dce0e5] bg-white px-3 py-2 text-sm font-semibold text-[#111418] disabled:opacity-50"
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
       >
@@ -47,7 +47,7 @@ export default function Pagination({ page, totalPages, onPageChange }) {
       })}
       <button
         type="button"
-        className="link-button rounded-lg border border-[#dce0e5] bg-white px-3 py-2 text-sm font-semibold text-[#111418] disabled:cursor-not-allowed disabled:opacity-50"
+        className="link-button rounded-lg border border-[#dce0e5] bg-white px-3 py-2 text-sm font-semibold text-[#111418] disabled:opacity-50"
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
       >

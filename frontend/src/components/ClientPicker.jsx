@@ -22,7 +22,7 @@ export default function ClientPicker({
     }
 
     if (value) {
-      setQuery("Cliente eliminado");
+      setQuery("Cliente no encontrado");
       return;
     }
 
