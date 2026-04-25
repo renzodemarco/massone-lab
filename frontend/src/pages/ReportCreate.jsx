@@ -1,17 +1,19 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getClients } from "../services/clients";
+import { getClientById, getClients } from "../services/clients";
 import { postReport } from "../services/reports";
 import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
+import VeterinarianPicker from "../components/VeterinarianPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
 import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
+  const [clientVeterinarians, setClientVeterinarians] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
@@ -51,6 +53,28 @@ export default function ReportCreate() {
     getNextReportNumber().then(next => setValue("protocolNumber", next));
   }, [setValue]);
 
+  const entryDate = watch("entryDate");
+  const studyType = watch("studyType");
+  const selectedClient = watch("client");
+  const selectedVeterinarian = watch("veterinarian");
+
+  useEffect(() => {
+    if (!selectedClient) {
+      setClientVeterinarians([]);
+      return;
+    }
+
+    getClientById(selectedClient)
+      .then((client) => {
+        const veterinarians = (client?.veterinarians || []).filter((veterinarian) => typeof veterinarian === "string" && veterinarian.trim());
+        setClientVeterinarians(veterinarians);
+      })
+      .catch((err) => {
+        console.error(err);
+        setClientVeterinarians([]);
+      });
+  }, [selectedClient]);
+
   const onSubmit = async (data) => {
     try {
       setLoading(true);
@@ -65,9 +89,6 @@ export default function ReportCreate() {
     }
   };
 
-  const entryDate = watch("entryDate");
-  const studyType = watch("studyType");
-  const selectedClient = watch("client");
   const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
@@ -124,17 +145,24 @@ export default function ReportCreate() {
               <ClientPicker
                 clients={clients}
                 value={selectedClient}
-                onChange={(clientId) => setValue("client", clientId, { shouldDirty: true, shouldValidate: true })}
+                onChange={(clientId) => {
+                  if (clientId !== selectedClient) {
+                    setValue("veterinarian", "", { shouldDirty: true, shouldValidate: true });
+                  }
+                  setValue("client", clientId, { shouldDirty: true, shouldValidate: true });
+                }}
                 error={errors.client?.message}
               />
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="veterinarian">Veterinario/a</label>
-              <input
-                {...register("veterinarian")}
-                id="veterinarian"
-                className="border p-2 rounded"
+              <input type="hidden" {...register("veterinarian")} />
+              <VeterinarianPicker
+                veterinarians={clientVeterinarians}
+                value={selectedVeterinarian}
+                onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true, shouldValidate: true })}
+                error={errors.veterinarian?.message}
+                disabled={!selectedClient}
               />
             </div>
 
