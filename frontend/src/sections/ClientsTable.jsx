@@ -29,15 +29,15 @@ export default function ClientsTable({ query }) {
           <thead>
             <tr className="bg-white text-sm font-medium text-[#111418]">
               <th className="px-3 py-3 text-center">Nombre</th>
-              <th className="px-3 py-3 text-center">Direccion</th>
-              <th className="px-3 py-3 text-center">Correo electronico</th>
+              <th className="px-3 py-3 text-center">Dirección</th>
+              <th className="px-3 py-3 text-center">Correo electrónico</th>
               <th className="px-3 py-3 text-center">Editar</th>
             </tr>
           </thead>
           <tbody>
             {data.docs.map((client, index) => (
               <tr key={index} className="border-t border-[#dce0e5]">
-                <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{client.name}</td>
+                <td className="truncate px-3 py-2 text-center text-sm text-[#111418]">{client.name}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{client.address || "-"}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{client.email}</td>
                 <td className="px-3 py-2 text-center text-sm">

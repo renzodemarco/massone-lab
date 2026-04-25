@@ -5,6 +5,7 @@ import { getClients } from "../services/clients";
 import { postReport } from "../services/reports";
 import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
+import ClientPicker from "../components/ClientPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
 import { calculateDueDate } from "../utils/calculateDueDate";
@@ -66,6 +67,7 @@ export default function ReportCreate() {
 
   const entryDate = watch("entryDate");
   const studyType = watch("studyType");
+  const selectedClient = watch("client");
   const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
@@ -118,20 +120,13 @@ export default function ReportCreate() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-              <select
-                {...register("client", { required: "El cliente es obligatorio" })}
-                id="client"
-                className="border p-2 rounded"
-              >
-                <option value="">Seleccione</option>
-                {clients.map(client => (
-                  <option key={client._id} value={client._id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-              <FormError message={errors.client?.message} />
+              <input type="hidden" {...register("client", { required: "El cliente es obligatorio" })} />
+              <ClientPicker
+                clients={clients}
+                value={selectedClient}
+                onChange={(clientId) => setValue("client", clientId, { shouldDirty: true, shouldValidate: true })}
+                error={errors.client?.message}
+              />
             </div>
 
             <div>

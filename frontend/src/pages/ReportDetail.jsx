@@ -5,6 +5,7 @@ import { getReportByNumber, updateReport } from "../services/reports";
 import { getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
+import ClientPicker from "../components/ClientPicker";
 import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportDetail() {
 
@@ -13,7 +14,7 @@ export default function ReportDetail() {
   const [clients, setClients] = useState([]);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm();
 
   useEffect(() => {
     getReportByNumber(n)
@@ -106,20 +107,13 @@ export default function ReportDetail() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-              <select {...register("client")} id="client" className="border p-2 rounded" >
-                {!clients.some(client => client._id === selectedClient) && selectedClient && (
-                  <option value={selectedClient}>Cliente eliminado</option>
-                )}
-                {!selectedClient && (
-                  <option value="">Seleccione un cliente</option>
-                )}
-                {clients.map(client => (
-                  <option key={client._id} value={client._id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" {...register("client")} />
+              <ClientPicker
+                clients={clients}
+                value={selectedClient}
+                onChange={(clientId) => setValue("client", clientId, { shouldDirty: true })}
+                error={errors.client?.message}
+              />
             </div>
 
             <div>
