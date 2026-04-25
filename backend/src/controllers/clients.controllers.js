@@ -15,13 +15,13 @@ export async function POSTClient(req, res, next) {
 
 export async function GETAllClients(req, res, next) {
   try {
-    let { q, page = 1, limit = 20 } = req.query;
+    let { q, page = 1, limit = 4 } = req.query;
     q = q?.trim();
     page = Number(page);
     limit = Number(limit);
 
     if (isNaN(page) || page < 1) page = 1;
-    if (isNaN(limit) || limit < 1) limit = 20;
+    if (isNaN(limit) || limit < 1) limit = 4;
 
     const clients = await clientsServices.getClients({ q, page, limit });
     return res.status(200).json({ success: true, payload: clients });

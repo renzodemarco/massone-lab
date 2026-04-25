@@ -16,7 +16,7 @@ export async function createReport(data) {
 }
 
 export async function getReports(filters) {
-  const { limit = 20, page = 1, field, q, status, ...query } = filters;
+  const { limit = 4, page = 1, field, q, status, ...query } = filters;
   const options = { page, limit, sort: { createdAt: -1 }, lean: true, populate: { path: "client", select: "name email" } };
 
   if (status) {

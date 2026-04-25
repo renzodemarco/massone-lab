@@ -13,7 +13,7 @@ export default function ClientsTable({ query }) {
   }, [query]);
 
   useEffect(() => {
-    getClients({ query, page, limit: 20, paginated: true }).then(setData).catch(console.error);
+    getClients({ query, page, limit: 4, paginated: true }).then(setData).catch(console.error);
   }, [query, page]);
 
   return (

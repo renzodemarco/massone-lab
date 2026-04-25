@@ -15,7 +15,7 @@ export async function getReports(searchParams = {}) {
   try {
     const params = {
       page: searchParams.page || 1,
-      limit: searchParams.limit || 20
+      limit: searchParams.limit || 4
     };
 
     if (searchParams.q) params.q = searchParams.q;

@@ -25,7 +25,7 @@ export default function ReportsTable({ searchParams }) {
   }, [searchParams]);
 
   useEffect(() => {
-    getReports({ ...searchParams, page, limit: 20 }).then(setData).catch(console.error);
+    getReports({ ...searchParams, page, limit: 4 }).then(setData).catch(console.error);
   }, [searchParams, page]);
 
   const handlePDF = async (id) => {

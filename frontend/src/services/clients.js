@@ -1,6 +1,6 @@
 import api from "./api";
 
-export async function getClients({ query = "", page = 1, limit = 20, paginated = false } = {}) {
+export async function getClients({ query = "", page = 1, limit = 4, paginated = false } = {}) {
   try {
     const res = await api.get("/clients", {
       params: {

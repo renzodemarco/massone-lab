@@ -23,7 +23,7 @@ export async function getAllClients() {
     {},
     {
       page: 1,
-      limit: 20,
+      limit: 4,
       sort: { createdAt: -1 },
       lean: true
     }
@@ -44,14 +44,14 @@ export async function getClientsByName(name) {
     },
     {
       page: 1,
-      limit: 20,
+      limit: 4,
       sort: { createdAt: -1 },
       lean: true
     }
   );
 }
 
-export async function getClients({ q, page = 1, limit = 20 }) {
+export async function getClients({ q, page = 1, limit = 4 }) {
   const query = {};
 
   if (q) {
