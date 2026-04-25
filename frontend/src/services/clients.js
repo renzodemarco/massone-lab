@@ -1,11 +1,15 @@
 import api from "./api";
 
-export async function getClients(query = "") {
+export async function getClients({ query = "", page = 1, limit = 20, paginated = false } = {}) {
   try {
     const res = await api.get("/clients", {
-      params: query ? { q: query } : {}
+      params: {
+        ...(query ? { q: query } : {}),
+        page,
+        limit: paginated ? limit : 1000
+      }
     });
-    return res.data.payload;
+    return paginated ? res.data.payload : (res.data.payload.docs || []);
   }
   catch (e) {
     console.error(e.response?.data ?? e.message ?? e)

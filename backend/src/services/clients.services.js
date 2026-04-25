@@ -19,7 +19,15 @@ export async function createClient(data) {
 }
 
 export async function getAllClients() {
-  return await ClientsModel.find();
+  return await ClientsModel.paginate(
+    {},
+    {
+      page: 1,
+      limit: 20,
+      sort: { createdAt: -1 },
+      lean: true
+    }
+  );
 }
 
 export async function getClientById(id) {
@@ -30,8 +38,31 @@ export async function getClientById(id) {
 
 export async function getClientsByName(name) {
   const escapedName = escapeRegex(name);
-  return await ClientsModel.find({
-    name: { $regex: escapedName, $options: 'i' }
+  return await ClientsModel.paginate(
+    {
+      name: { $regex: escapedName, $options: 'i' }
+    },
+    {
+      page: 1,
+      limit: 20,
+      sort: { createdAt: -1 },
+      lean: true
+    }
+  );
+}
+
+export async function getClients({ q, page = 1, limit = 20 }) {
+  const query = {};
+
+  if (q) {
+    query.name = { $regex: escapeRegex(q), $options: 'i' };
+  }
+
+  return await ClientsModel.paginate(query, {
+    page,
+    limit,
+    sort: { createdAt: -1 },
+    lean: true
   });
 }
 
