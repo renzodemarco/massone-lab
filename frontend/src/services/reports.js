@@ -13,7 +13,10 @@ export async function postReport(data) {
 
 export async function getReports(searchParams = {}) {
   try {
-    const params = {};
+    const params = {
+      page: searchParams.page || 1,
+      limit: searchParams.limit || 4
+    };
 
     if (searchParams.q) params.q = searchParams.q;
     if (searchParams.field && searchParams.q) params.field = searchParams.field;

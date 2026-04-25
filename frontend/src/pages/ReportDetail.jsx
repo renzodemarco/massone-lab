@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReportByNumber, updateReport } from "../services/reports";
-import { getClients } from "../services/clients";
+import { getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
+import ClientPicker from "../components/ClientPicker";
+import VeterinarianPicker from "../components/VeterinarianPicker";
 import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportDetail() {
 
   const { n } = useParams();
   const [reportId, setReportId] = useState(null);
   const [clients, setClients] = useState([]);
+  const [clientVeterinarians, setClientVeterinarians] = useState([]);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm();
 
   useEffect(() => {
     getReportByNumber(n)
@@ -49,6 +52,28 @@ export default function ReportDetail() {
       .catch(err => console.error(err));
   }, [n, reset]);
 
+  const entryDate = watch("entryDate");
+  const studyType = watch("studyType");
+  const selectedClient = watch("client");
+  const selectedVeterinarian = watch("veterinarian");
+
+  useEffect(() => {
+    if (!selectedClient) {
+      setClientVeterinarians([]);
+      return;
+    }
+
+    getClientById(selectedClient)
+      .then((client) => {
+        const veterinarians = (client?.veterinarians || []).filter((veterinarian) => typeof veterinarian === "string" && veterinarian.trim());
+        setClientVeterinarians(veterinarians);
+      })
+      .catch((err) => {
+        console.error(err);
+        setClientVeterinarians([]);
+      });
+  }, [selectedClient]);
+
   const onSubmit = async (formData) => {
     try {
       await updateReport(reportId, formData);
@@ -60,9 +85,6 @@ export default function ReportDetail() {
     }
   };
 
-  const entryDate = watch("entryDate");
-  const studyType = watch("studyType");
-  const selectedClient = watch("client");
   const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
@@ -106,25 +128,29 @@ export default function ReportDetail() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="client">Cliente</label>
-              <select {...register("client")} id="client" className="border p-2 rounded" >
-                {!clients.some(client => client._id === selectedClient) && selectedClient && (
-                  <option value={selectedClient}>Cliente eliminado</option>
-                )}
-                {!selectedClient && (
-                  <option value="">Seleccione un cliente</option>
-                )}
-                {clients.map(client => (
-                  <option key={client._id} value={client._id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" {...register("client")} />
+              <ClientPicker
+                clients={clients}
+                value={selectedClient}
+                onChange={(clientId) => {
+                  if (clientId !== selectedClient) {
+                    setValue("veterinarian", "", { shouldDirty: true });
+                  }
+                  setValue("client", clientId, { shouldDirty: true });
+                }}
+                error={errors.client?.message}
+              />
             </div>
 
             <div>
-              <label className="block mb-1 font-medium" htmlFor="veterinarian">Veterinario/a</label>
-              <input {...register("veterinarian")} id="veterinarian" className="border p-2 rounded" />
+              <input type="hidden" {...register("veterinarian")} />
+              <VeterinarianPicker
+                veterinarians={clientVeterinarians}
+                value={selectedVeterinarian}
+                onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true })}
+                error={errors.veterinarian?.message}
+                disabled={!selectedClient}
+              />
             </div>
 
             <div>

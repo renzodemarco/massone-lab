@@ -34,7 +34,7 @@ export default function SearchBar({
             aria-label="Limpiar búsqueda"
             title="Limpiar búsqueda"
           >
-            X
+            Limpiar
           </button>
         )}
         {children}
