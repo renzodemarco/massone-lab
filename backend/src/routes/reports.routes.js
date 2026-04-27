@@ -5,6 +5,7 @@ import * as middlewares from "../middlewares/middlewares.js"
 const router = Router();
 
 router.post("/", middlewares.validateClient, reportsControllers.POSTReport)
+.post("/:id/images", middlewares.uploadReportImages, reportsControllers.POSTReportImages)
 .get("/", reportsControllers.GETReports)
 .get("/:id", reportsControllers.GETReportById)
 .get("/number/last", reportsControllers.GETLastReportNumber)

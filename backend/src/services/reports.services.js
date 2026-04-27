@@ -111,6 +111,8 @@ export async function updateReport(id, data) {
 }
 
 export async function uploadReportImages(id, files = []) {
+  if (!mongoose.isValidObjectId(id)) CustomError.new(dictionary.invalidReportId);
+
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
   if (!files.length) CustomError.new(dictionary.reportImagesRequired);

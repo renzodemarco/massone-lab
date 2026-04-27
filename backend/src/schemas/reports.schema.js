@@ -32,14 +32,6 @@ export const createReportSchema = Joi.object({
   comments: Joi.string().trim().optional().allow(''),
   result: Joi.string().trim().optional().allow(''),
 
-  images: Joi.array().items(
-    Joi.object({
-      _id: Joi.string().trim().optional(),
-      secureUrl: Joi.string().trim().required(),
-      publicId: Joi.string().trim().required()
-    })
-  ).optional(),
-
   dueDate: Joi.date().optional(),
   entryDate: Joi.date().max('now').required()
 });
@@ -75,14 +67,6 @@ export const updateReportSchema = Joi.object({
   microDescription: Joi.string().trim().optional().allow(''),
   comments: Joi.string().trim().optional().allow(''),
   result: Joi.string().trim().optional().allow(''),
-
-  images: Joi.array().items(
-    Joi.object({
-      _id: Joi.string().trim().optional(),
-      secureUrl: Joi.string().trim().required(),
-      publicId: Joi.string().trim().required()
-    })
-  ).optional(),
 
   entryDate: Joi.date().max('now').optional(),
   dueDate: Joi.date().optional()

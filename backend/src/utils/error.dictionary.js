@@ -19,9 +19,25 @@ export const dictionary = {
     status: 404,
     message: "Report not found"
   },
+  invalidReportId: {
+    status: 400,
+    message: "Invalid report id"
+  },
   reportImagesRequired: {
     status: 400,
     message: "At least one image file is required"
+  },
+  reportImagesLimitExceeded: {
+    status: 400,
+    message: "A report can include up to 6 images per upload"
+  },
+  reportImageTooLarge: {
+    status: 400,
+    message: "Each report image must be 5 MB or smaller"
+  },
+  reportInvalidImageType: {
+    status: 400,
+    message: "Only image files are allowed for reports"
   },
   reportImageUploadFailed: {
     status: 500,

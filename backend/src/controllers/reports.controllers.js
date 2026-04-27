@@ -78,6 +78,17 @@ export async function PUTReport(req, res, next) {
   }
 }
 
+export async function POSTReportImages(req, res, next) {
+  try {
+    const { id } = req.params;
+    const images = await reportsServices.uploadReportImages(id, req.files);
+    return res.status(201).json({ success: true, payload: images });
+  }
+  catch (e) {
+    next(e);
+  }
+}
+
 export async function DELETEReport(req, res, next) {
   try {
     const { id } = req.params;
