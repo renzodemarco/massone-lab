@@ -164,6 +164,23 @@ export async function uploadReportImages(id, files = []) {
   }
 }
 
+export async function deleteReportImage(id, imageId) {
+  if (!mongoose.isValidObjectId(id)) CustomError.new(dictionary.invalidReportId);
+  if (!mongoose.isValidObjectId(imageId)) CustomError.new(dictionary.invalidReportImageId);
+
+  const report = await ReportsModel.findById(id);
+  if (!report) CustomError.new(dictionary.reportNotFound);
+
+  const image = report.images.find(item => item._id.toString() === imageId);
+  if (!image) CustomError.new(dictionary.reportImageNotFound);
+
+  await destroyCloudinaryImage(image.publicId);
+  report.images = report.images.filter(item => item._id.toString() !== imageId);
+  await report.save();
+
+  return report.images;
+}
+
 export async function deleteReport(id) {
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);

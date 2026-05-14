@@ -23,6 +23,10 @@ export const dictionary = {
     status: 400,
     message: "Invalid report id"
   },
+  invalidReportImageId: {
+    status: 400,
+    message: "Invalid report image id"
+  },
   reportImagesRequired: {
     status: 400,
     message: "At least one image file is required"
@@ -46,6 +50,10 @@ export const dictionary = {
   reportImageDeleteFailed: {
     status: 500,
     message: "Report image cleanup failed"
+  },
+  reportImageNotFound: {
+    status: 404,
+    message: "Report image not found"
   },
   protocolNumberExists: {
     status: 409,

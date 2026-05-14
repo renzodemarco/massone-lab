@@ -89,6 +89,17 @@ export async function POSTReportImages(req, res, next) {
   }
 }
 
+export async function DELETEReportImage(req, res, next) {
+  try {
+    const { id, imageId } = req.params;
+    const images = await reportsServices.deleteReportImage(id, imageId);
+    return res.status(200).json({ success: true, payload: images });
+  }
+  catch (e) {
+    next(e);
+  }
+}
+
 export async function DELETEReport(req, res, next) {
   try {
     const { id } = req.params;
