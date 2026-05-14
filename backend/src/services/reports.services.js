@@ -3,9 +3,11 @@ import ClientsModel from '../models/clients.model.js';
 import * as pdf from '../utils/pdf.generator.js'
 import CustomError from '../utils/custom.error.js';
 import dictionary from '../utils/error.dictionary.js';
-import { calculateDueDate } from '../utils/calculateDueDate.js';
+import { calculateDueDate } from '../utils/calculate.due.date.js';
 import cloudinary from '../config/cloudinary.config.js';
 import mongoose from 'mongoose';
+import { Readable } from 'stream';
+import { isValidImageBuffer } from '../utils/is.valid.image.buffer.js';
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -17,17 +19,34 @@ async function uploadFileToCloudinary(file, reportId) {
     resource_type: "image"
   };
 
-  if (file.path) {
-    return await cloudinary.uploader.upload(file.path, options);
-  }
-
   if (file.buffer) {
-    const base64 = file.buffer.toString("base64");
-    const dataUri = `data:${file.mimetype};base64,${base64}`;
-    return await cloudinary.uploader.upload(dataUri, options);
+    return await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      });
+
+      Readable.from(file.buffer).pipe(uploadStream);
+    });
   }
 
   CustomError.new(dictionary.reportImageUploadFailed);
+}
+
+async function destroyCloudinaryImage(publicId) {
+  if (!publicId) return;
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "image"
+    });
+
+    if (result.result !== "ok" && result.result !== "not found") {
+      CustomError.new(dictionary.reportImageDeleteFailed);
+    }
+  } catch {
+    CustomError.new(dictionary.reportImageDeleteFailed);
+  }
 }
 
 export async function createReport(data) {
@@ -116,11 +135,16 @@ export async function uploadReportImages(id, files = []) {
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
   if (!files.length) CustomError.new(dictionary.reportImagesRequired);
+  if (files.some(file => !isValidImageBuffer(file.buffer))) {
+    CustomError.new(dictionary.reportInvalidImageType);
+  }
 
+  const uploadedPublicIds = [];
   try {
     const uploads = await Promise.all(
       files.map(async (file) => {
         const uploaded = await uploadFileToCloudinary(file, report._id);
+        uploadedPublicIds.push(uploaded.public_id);
 
         return {
           _id: new mongoose.Types.ObjectId(),
@@ -134,14 +158,19 @@ export async function uploadReportImages(id, files = []) {
     await report.save();
     return report.images;
   } catch (error) {
+    await Promise.allSettled(uploadedPublicIds.map(publicId => destroyCloudinaryImage(publicId)));
     if (error.status) throw error;
     CustomError.new(dictionary.reportImageUploadFailed);
   }
 }
 
 export async function deleteReport(id) {
-  const report = await ReportsModel.findByIdAndDelete(id)
+  const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
+
+  await Promise.all(report.images.map(image => destroyCloudinaryImage(image.publicId)));
+  await report.deleteOne();
+
   return report;
 }
 

@@ -43,6 +43,10 @@ export const dictionary = {
     status: 500,
     message: "Report image upload failed"
   },
+  reportImageDeleteFailed: {
+    status: 500,
+    message: "Report image cleanup failed"
+  },
   protocolNumberExists: {
     status: 409,
     message: "Protocol number already exists"
