@@ -7,11 +7,13 @@ import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
+import ReportImages from "../components/ReportImages";
 import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportDetail() {
 
   const { n } = useParams();
   const [reportId, setReportId] = useState(null);
+  const [reportImages, setReportImages] = useState([]);
   const [clients, setClients] = useState([]);
   const [clientVeterinarians, setClientVeterinarians] = useState([]);
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function ReportDetail() {
     getReportByNumber(n)
       .then((data) => {
         setReportId(data._id);
+        setReportImages(data.images || []);
         reset({
           protocolNumber: data.protocolNumber,
           status: data.status,
@@ -250,6 +253,14 @@ export default function ReportDetail() {
               <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
               <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
             </div>
+
+            {reportId ? (
+              <ReportImages
+                reportId={reportId}
+                images={reportImages}
+                onImagesChange={setReportImages}
+              />
+            ) : null}
 
             <div className="flex justify-center col-span-2">
               <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">

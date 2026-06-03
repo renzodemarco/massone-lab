@@ -75,6 +75,34 @@ export async function updateReport(id, data) {
   }
 }
 
+export async function uploadReportImages(reportId, files) {
+  try {
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    const res = await api.post(`/reports/${reportId}/images`, formData);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e);
+    throw e;
+  }
+}
+
+export async function deleteReportImage(reportId, imageId) {
+  try {
+    const res = await api.delete(`/reports/${reportId}/images/${imageId}`);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e);
+    throw e;
+  }
+}
+
 export async function destroyReport(id) {
   try {
     const res = await api.delete(`/reports/${id}`);
