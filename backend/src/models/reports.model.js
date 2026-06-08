@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { calculateDueDate } from "../utils/calculateDueDate.js";
+import { calculateDueDate } from "../utils/calculate.due.date.js";
 
 const patientSchema = new mongoose.Schema(
   {
@@ -95,8 +95,15 @@ const reportSchema = new mongoose.Schema(
     },
     images: [
       {
-        type: String,
-        trim: true
+        _id: mongoose.Schema.ObjectId,
+        secureUrl: {
+          type: String,
+          trim: true
+        },
+        publicId: {
+          type: String,
+          trim: true
+        }
       }
     ],
     entryDate: {

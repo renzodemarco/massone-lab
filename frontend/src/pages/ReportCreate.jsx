@@ -2,18 +2,18 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClientById, getClients } from "../services/clients";
-import { postReport } from "../services/reports";
+import { getReportDueDate, postReport } from "../services/reports";
 import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
-import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
   const [clientVeterinarians, setClientVeterinarians] = useState([]);
+  const [dueDate, setDueDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
@@ -59,6 +59,20 @@ export default function ReportCreate() {
   const selectedVeterinarian = watch("veterinarian");
 
   useEffect(() => {
+    if (!entryDate || !studyType) {
+      setDueDate(null);
+      return;
+    }
+
+    getReportDueDate(entryDate, studyType)
+      .then((value) => setDueDate(value ? new Date(value) : null))
+      .catch((err) => {
+        console.error(err);
+        setDueDate(null);
+      });
+  }, [entryDate, studyType]);
+
+  useEffect(() => {
     if (!selectedClient) {
       setClientVeterinarians([]);
       return;
@@ -88,8 +102,6 @@ export default function ReportCreate() {
       setLoading(false);
     }
   };
-
-  const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">

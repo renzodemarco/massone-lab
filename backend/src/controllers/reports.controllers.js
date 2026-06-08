@@ -1,5 +1,5 @@
 import * as reportsServices from "../services/reports.services.js";
-import { createReportSchema, updateReportSchema } from "../schemas/reports.schema.js";
+import { createReportSchema, dueDateQuerySchema, updateReportSchema } from "../schemas/reports.schema.js";
 
 export async function POSTReport(req, res, next) {
   try {
@@ -65,6 +65,18 @@ export async function GETLastReportNumber(req, res, next) {
   }
 }
 
+export async function GETDueDate(req, res, next) {
+  try {
+    const { error, value } = dueDateQuerySchema.validate(req.query);
+    if (error) return res.status(400).json({ success: false, message: error.details[0].message });
+    const dueDate = reportsServices.calculateReportDueDate(value.entryDate, value.studyType);
+    return res.status(200).json({ success: true, payload: dueDate });
+  }
+  catch (e) {
+    next(e)
+  }
+}
+
 export async function PUTReport(req, res, next) {
   try {
     const { id } = req.params;
@@ -75,6 +87,28 @@ export async function PUTReport(req, res, next) {
   }
   catch (e) {
     next(e)
+  }
+}
+
+export async function POSTReportImages(req, res, next) {
+  try {
+    const { id } = req.params;
+    const images = await reportsServices.uploadReportImages(id, req.files);
+    return res.status(201).json({ success: true, payload: images });
+  }
+  catch (e) {
+    next(e);
+  }
+}
+
+export async function DELETEReportImage(req, res, next) {
+  try {
+    const { id, imageId } = req.params;
+    const images = await reportsServices.deleteReportImage(id, imageId);
+    return res.status(200).json({ success: true, payload: images });
+  }
+  catch (e) {
+    next(e);
   }
 }
 
