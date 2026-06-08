@@ -73,7 +73,7 @@ export const updateReportSchema = Joi.object({
 });
 
 export const dueDateQuerySchema = Joi.object({
-  entryDate: Joi.date().max('now').required(),
+  entryDate: Joi.date().required(),
   studyType: Joi.string()
     .valid('cito', 'hp', 'ihq')
     .required()
