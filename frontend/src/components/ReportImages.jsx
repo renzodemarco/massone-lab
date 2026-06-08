@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { deleteReportImage, uploadReportImages } from "../services/reports";
 
+const REPORT_IMAGE_LIMIT = 4;
+
 export default function ReportImages({ reportId, images = [], onImagesChange }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -22,7 +24,16 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files || []);
+    const remainingSlots = Math.max(REPORT_IMAGE_LIMIT - images.length, 0);
     setError("");
+
+    if (files.length > remainingSlots) {
+      setError(`Este informe puede tener hasta ${REPORT_IMAGE_LIMIT} imagenes en total. Te quedan ${remainingSlots} lugar(es).`);
+      setSelectedFiles(files.slice(0, remainingSlots));
+      event.target.value = "";
+      return;
+    }
+
     setSelectedFiles(files);
   };
 
@@ -58,6 +69,8 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
   };
 
   const totalAfterUpload = images.length + selectedFiles.length;
+  const remainingSlots = Math.max(REPORT_IMAGE_LIMIT - images.length, 0);
+  const hasReachedImageLimit = remainingSlots === 0;
 
   return (
     <section className="col-span-2 mt-4 rounded-lg border border-[#dce0e5] bg-[#fcfcfb] p-5">
@@ -65,11 +78,11 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
         <div>
           <h2 className="text-2xl font-bold">Imagenes</h2>
           <p className="text-sm text-gray-500">
-            Hasta 6 por subida y 5 MB por archivo.
+            Hasta {REPORT_IMAGE_LIMIT} imagenes por informe, 5 MB por archivo.
           </p>
         </div>
         <p className="text-sm text-gray-500">
-          {images.length} guardadas{selectedFiles.length ? ` + ${selectedFiles.length} pendientes` : ""}
+          {images.length} de {REPORT_IMAGE_LIMIT} guardadas{selectedFiles.length ? ` + ${selectedFiles.length} pendientes` : ""}
         </p>
       </div>
 
@@ -83,13 +96,16 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
           accept="image/*"
           multiple
           onChange={handleFileChange}
+          disabled={hasReachedImageLimit || isUploading}
           className="block w-full rounded border border-[#dce0e5] p-2"
         />
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <p className="text-sm text-gray-500">
             {selectedFiles.length
               ? `${selectedFiles.length} archivo(s) listo(s) para subir. Total visible: ${totalAfterUpload}.`
-              : "Todavia no seleccionaste imagenes nuevas."}
+              : hasReachedImageLimit
+                ? `Este informe ya tiene el maximo de ${REPORT_IMAGE_LIMIT} imagenes.`
+                : `Todavia no seleccionaste imagenes nuevas. Quedan ${remainingSlots} lugar(es).`}
           </p>
           <div className="flex gap-3">
             <button
@@ -106,7 +122,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
             <button
               type="button"
               onClick={handleUpload}
-              disabled={!selectedFiles.length || isUploading}
+              disabled={!selectedFiles.length || isUploading || hasReachedImageLimit}
               className="link-button rounded-lg bg-[#632b91] px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isUploading ? "Subiendo..." : "Subir imagenes"}

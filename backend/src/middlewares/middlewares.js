@@ -4,7 +4,7 @@ import CustomError from "../utils/custom.error.js";
 import dictionary from "../utils/error.dictionary.js";
 import mongoose from "mongoose";
 
-const REPORT_IMAGE_MAX_FILES = 6;
+const REPORT_IMAGE_MAX_FILES = 4;
 const REPORT_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
 
 export function validateObjectIdParam(paramName, errorKey = "invalidQuery") {

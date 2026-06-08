@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 import { Readable } from 'stream';
 import { isValidImageBuffer } from '../utils/is.valid.image.buffer.js';
 
+const REPORT_IMAGE_MAX_FILES = 4;
+
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -137,6 +139,9 @@ export async function uploadReportImages(id, files = []) {
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
   if (!files.length) CustomError.new(dictionary.reportImagesRequired);
+  if (report.images.length + files.length > REPORT_IMAGE_MAX_FILES) {
+    CustomError.new(dictionary.reportImagesLimitExceeded);
+  }
   if (files.some(file => !isValidImageBuffer(file.buffer))) {
     CustomError.new(dictionary.reportInvalidImageType);
   }

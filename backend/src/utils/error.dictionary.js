@@ -37,7 +37,7 @@ export const dictionary = {
   },
   reportImagesLimitExceeded: {
     status: 400,
-    message: "A report can include up to 6 images per upload"
+    message: "A report can include up to 4 images"
   },
   reportImageTooLarge: {
     status: 400,
