@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FormError from "./FormError";
 
 export default function VeterinarianPicker({
@@ -13,21 +13,15 @@ export default function VeterinarianPicker({
   const containerRef = useRef(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const normalizedVeterinarians = veterinarians.map((veterinarian) => veterinarian.trim()).filter(Boolean);
+  const normalizedVeterinarians = useMemo(() => {
+    return veterinarians
+      .map((veterinarian) => veterinarian.trim())
+      .filter(Boolean);
+  }, [veterinarians]);
 
   useEffect(() => {
-    if (normalizedVeterinarians.includes(value)) {
-      setQuery(value);
-      return;
-    }
-
-    if (value) {
-      setQuery("Veterinario no encontrado");
-      return;
-    }
-
-    setQuery("");
-  }, [normalizedVeterinarians, value]);
+    setQuery(value || "");
+  }, [value]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -50,10 +44,7 @@ export default function VeterinarianPicker({
     const nextValue = event.target.value;
     setQuery(nextValue);
     setOpen(true);
-
-    if (value !== nextValue) {
-      onChange("");
-    }
+    onChange(nextValue);
   };
 
   const handleSelect = (veterinarian) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReportByNumber, getReportDueDate, updateReport } from "../services/reports";
-import { getClientById, getClients } from "../services/clients";
+import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
@@ -91,8 +91,31 @@ export default function ReportDetail() {
       });
   }, [selectedClient]);
 
+  const maybeAddVeterinarianToClient = async (data) => {
+    const veterinarian = data.veterinarian?.trim();
+    if (!data.client || !veterinarian) return;
+
+    const alreadyExists = clientVeterinarians.some(
+      (item) => item.trim().toLowerCase() === veterinarian.toLowerCase()
+    );
+
+    if (alreadyExists) return;
+
+    const shouldAdd = window.confirm(
+      `El veterinario/a "${veterinarian}" no existe en este cliente. Desea agregarlo a la lista del cliente?`
+    );
+
+    if (!shouldAdd) return;
+
+    const updatedClient = await addVeterinarianToClient(data.client, clientVeterinarians, veterinarian);
+    if (updatedClient?.veterinarians) {
+      setClientVeterinarians(updatedClient.veterinarians);
+    }
+  };
+
   const onSubmit = async (formData) => {
     try {
+      await maybeAddVeterinarianToClient(formData);
       await updateReport(reportId, formData);
       alert("Informe actualizado!");
       navigate("/?view=reports");
