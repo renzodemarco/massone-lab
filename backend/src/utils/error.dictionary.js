@@ -11,6 +11,10 @@ export const dictionary = {
     status: 400,
     message: "Client is required"
   },
+  invalidClientId: {
+    status: 400,
+    message: "Invalid client id"
+  },
   clientHasReports: {
     status: 409,
     message: "Client cannot be deleted because it has associated reports"

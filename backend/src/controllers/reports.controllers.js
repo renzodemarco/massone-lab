@@ -1,5 +1,5 @@
 import * as reportsServices from "../services/reports.services.js";
-import { createReportSchema, updateReportSchema } from "../schemas/reports.schema.js";
+import { createReportSchema, dueDateQuerySchema, updateReportSchema } from "../schemas/reports.schema.js";
 
 export async function POSTReport(req, res, next) {
   try {
@@ -59,6 +59,18 @@ export async function GETLastReportNumber(req, res, next) {
   try {
     const number = await reportsServices.getLastReportNumber();
     return res.status(200).json({ success: true, payload: number })
+  }
+  catch (e) {
+    next(e)
+  }
+}
+
+export async function GETDueDate(req, res, next) {
+  try {
+    const { error, value } = dueDateQuerySchema.validate(req.query);
+    if (error) return res.status(400).json({ success: false, message: error.details[0].message });
+    const dueDate = reportsServices.calculateReportDueDate(value.entryDate, value.studyType);
+    return res.status(200).json({ success: true, payload: dueDate });
   }
   catch (e) {
     next(e)

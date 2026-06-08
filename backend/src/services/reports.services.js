@@ -101,6 +101,10 @@ export async function getLastReportNumber() {
   return last?.protocolNumber || "00000";
 }
 
+export function calculateReportDueDate(entryDate, studyType) {
+  return calculateDueDate(entryDate, studyType);
+}
+
 export async function updateReport(id, data) {
   const existing = await ReportsModel.findById(id);
   if (!existing) CustomError.new(dictionary.reportNotFound);
@@ -130,8 +134,6 @@ export async function updateReport(id, data) {
 }
 
 export async function uploadReportImages(id, files = []) {
-  if (!mongoose.isValidObjectId(id)) CustomError.new(dictionary.invalidReportId);
-
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
   if (!files.length) CustomError.new(dictionary.reportImagesRequired);
@@ -165,9 +167,6 @@ export async function uploadReportImages(id, files = []) {
 }
 
 export async function deleteReportImage(id, imageId) {
-  if (!mongoose.isValidObjectId(id)) CustomError.new(dictionary.invalidReportId);
-  if (!mongoose.isValidObjectId(imageId)) CustomError.new(dictionary.invalidReportImageId);
-
   const report = await ReportsModel.findById(id);
   if (!report) CustomError.new(dictionary.reportNotFound);
 

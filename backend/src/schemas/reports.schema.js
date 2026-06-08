@@ -32,7 +32,7 @@ export const createReportSchema = Joi.object({
   comments: Joi.string().trim().optional().allow(''),
   result: Joi.string().trim().optional().allow(''),
 
-  dueDate: Joi.date().optional(),
+  dueDate: Joi.forbidden(),
   entryDate: Joi.date().max('now').required()
 });
 
@@ -69,6 +69,13 @@ export const updateReportSchema = Joi.object({
   result: Joi.string().trim().optional().allow(''),
 
   entryDate: Joi.date().max('now').optional(),
-  dueDate: Joi.date().optional()
+  dueDate: Joi.forbidden()
+});
+
+export const dueDateQuerySchema = Joi.object({
+  entryDate: Joi.date().max('now').required(),
+  studyType: Joi.string()
+    .valid('cito', 'hp', 'ihq')
+    .required()
 });
 

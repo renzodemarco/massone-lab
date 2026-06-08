@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportByNumber, updateReport } from "../services/reports";
+import { getReportByNumber, getReportDueDate, updateReport } from "../services/reports";
 import { getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import ReportImages from "../components/ReportImages";
-import { calculateDueDate } from "../utils/calculateDueDate";
 export default function ReportDetail() {
 
   const { n } = useParams();
@@ -16,6 +15,7 @@ export default function ReportDetail() {
   const [reportImages, setReportImages] = useState([]);
   const [clients, setClients] = useState([]);
   const [clientVeterinarians, setClientVeterinarians] = useState([]);
+  const [dueDate, setDueDate] = useState(null);
   const navigate = useNavigate();
 
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm();
@@ -61,6 +61,20 @@ export default function ReportDetail() {
   const selectedVeterinarian = watch("veterinarian");
 
   useEffect(() => {
+    if (!entryDate || !studyType) {
+      setDueDate(null);
+      return;
+    }
+
+    getReportDueDate(entryDate, studyType)
+      .then((value) => setDueDate(value ? new Date(value) : null))
+      .catch((err) => {
+        console.error(err);
+        setDueDate(null);
+      });
+  }, [entryDate, studyType]);
+
+  useEffect(() => {
     if (!selectedClient) {
       setClientVeterinarians([]);
       return;
@@ -87,8 +101,6 @@ export default function ReportDetail() {
       alert("Error al actualizar");
     }
   };
-
-  const dueDate = entryDate && studyType ? calculateDueDate(entryDate, studyType) : null;
 
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">

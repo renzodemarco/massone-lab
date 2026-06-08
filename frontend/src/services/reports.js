@@ -64,6 +64,19 @@ export async function getLastReportNumber() {
   }
 }
 
+export async function getReportDueDate(entryDate, studyType) {
+  try {
+    const res = await api.get("/reports/due-date", {
+      params: { entryDate, studyType }
+    });
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e);
+    throw e;
+  }
+}
+
 export async function updateReport(id, data) {
   try {
     const res = await api.put(`/reports/${id}`, data);
