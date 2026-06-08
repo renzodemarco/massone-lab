@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { deleteReportImage, uploadReportImages } from "../services/reports";
 
 const REPORT_IMAGE_LIMIT = 4;
 
 export default function ReportImages({ reportId, images = [], onImagesChange }) {
+  const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingImageId, setDeletingImageId] = useState(null);
@@ -21,6 +22,11 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
       previews.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, [previews]);
+
+  const resetFileSelection = () => {
+    setSelectedFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files || []);
@@ -45,7 +51,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
       setError("");
       const nextImages = await uploadReportImages(reportId, selectedFiles);
       onImagesChange(nextImages);
-      setSelectedFiles([]);
+      resetFileSelection();
     } catch (err) {
       setError(err.response?.data?.message || "No se pudieron subir las imagenes.");
     } finally {
@@ -71,6 +77,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
   const totalAfterUpload = images.length + selectedFiles.length;
   const remainingSlots = Math.max(REPORT_IMAGE_LIMIT - images.length, 0);
   const hasReachedImageLimit = remainingSlots === 0;
+  const canChooseImages = !hasReachedImageLimit && !isUploading;
 
   return (
     <section className="col-span-2 mt-4 rounded-lg border border-[#dce0e5] bg-[#fcfcfb] p-5">
@@ -87,18 +94,36 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
       </div>
 
       <div className="mt-4 flex flex-col gap-3 rounded-lg border border-dashed border-[#cdbfdb] bg-white p-4">
-        <label className="block text-sm font-medium text-[#333333]" htmlFor="report-images-input">
-          Seleccionar imagenes
-        </label>
         <input
+          ref={fileInputRef}
           id="report-images-input"
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
           disabled={hasReachedImageLimit || isUploading}
-          className="block w-full rounded border border-[#dce0e5] p-2"
+          className="sr-only"
         />
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <label
+            htmlFor="report-images-input"
+            aria-disabled={!canChooseImages}
+            className={`inline-flex w-fit items-center justify-center rounded-lg border-2 px-5 py-2.5 font-semibold transition ${
+              canChooseImages
+                ? "link-button cursor-pointer border-[#632b91] bg-[#632b91] text-white"
+                : "cursor-not-allowed border-[#dce0e5] bg-[#f4f4f2] text-gray-400"
+            }`}
+          >
+            Elegir imagenes
+          </label>
+          <p className="text-sm font-medium text-[#637588]">
+            {hasReachedImageLimit
+              ? "Cupo completo"
+              : `${remainingSlots} lugar(es) disponible(s)`}
+          </p>
+        </div>
+
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <p className="text-sm text-gray-500">
             {selectedFiles.length
@@ -111,8 +136,8 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
             <button
               type="button"
               onClick={() => {
-                setSelectedFiles([]);
                 setError("");
+                resetFileSelection();
               }}
               disabled={!selectedFiles.length || isUploading}
               className="delete-button rounded-lg border border-[#99144d] px-4 py-2 font-semibold text-[#99144d] transition disabled:cursor-not-allowed disabled:opacity-50"
@@ -144,7 +169,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
           </h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {previews.map((preview) => (
-              <article key={preview.url} className="overflow-hidden rounded-lg border border-[#ebe6f1] bg-white">
+              <article key={preview.url} className="overflow-hidden rounded-lg border border-[#ebe6f1] bg-white opacity-80">
                 <img src={preview.url} alt={preview.name} className="h-40 w-full object-cover" />
                 <div className="border-t border-[#ebe6f1] px-3 py-2">
                   <p className="truncate text-sm text-gray-600">{preview.name}</p>
