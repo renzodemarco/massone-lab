@@ -6,6 +6,7 @@ export default function VeterinarianPicker({
   value,
   onChange,
   error,
+  onAdd,
   disabled = false,
   id = "veterinarian",
   placeholder = "Buscar veterinario...",
@@ -68,6 +69,13 @@ export default function VeterinarianPicker({
           type="text"
           value={query}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.stopPropagation();
+              onAdd?.(query);
+            }
+          }}
           onFocus={() => !disabled && setOpen(true)}
           placeholder={disabled ? "Seleccione un cliente primero" : placeholder}
           autoComplete="off"

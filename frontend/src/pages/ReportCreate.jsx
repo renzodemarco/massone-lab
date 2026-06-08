@@ -9,6 +9,7 @@ import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
+import { confirmAddVeterinarian } from "../utils/sweetAlerts";
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
@@ -99,9 +100,7 @@ export default function ReportCreate() {
 
     if (alreadyExists) return;
 
-    const shouldAdd = window.confirm(
-      `El veterinario/a "${veterinarian}" no existe en este cliente ¿Desea agregarlo a la lista del cliente?`
-    );
+    const shouldAdd = await confirmAddVeterinarian(veterinarian);
 
     if (!shouldAdd) return;
 
@@ -114,7 +113,6 @@ export default function ReportCreate() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await maybeAddVeterinarianToClient(data);
       await postReport(data);
       setTimeout(() => {
         navigate("/?view=reports");
@@ -132,7 +130,12 @@ export default function ReportCreate() {
       <div className="p-6 min-h-screen w-[1000px] mx-auto">
         <div className=" px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
           <h1 className="text-3xl font-bold mb-4">Crear Informe</h1>
-          <form onSubmit={handleSubmit(onSubmit)} className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4">
+          <form 
+          onSubmit={handleSubmit(onSubmit)} 
+          className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
@@ -196,6 +199,7 @@ export default function ReportCreate() {
                 veterinarians={clientVeterinarians}
                 value={selectedVeterinarian}
                 onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true, shouldValidate: true })}
+                onAdd={(inputValue) => maybeAddVeterinarianToClient({client: selectedClient, veterinarian: inputValue})}
                 error={errors.veterinarian?.message}
                 disabled={!selectedClient}
               />
@@ -296,27 +300,52 @@ export default function ReportCreate() {
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="sampleInfo">Muestra Remitida</label>
-              <textarea {...register("sampleInfo")} id="sampleInfo" className="border p-2 rounded w-full" />
+              <textarea
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("sampleInfo")}
+                id="sampleInfo"
+                className="border p-2 rounded w-full"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="macroDescription">Descripción Macroscópica</label>
-              <textarea {...register("macroDescription")} id="macroDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("macroDescription")}
+                id="macroDescription" 
+                className="border p-2 rounded w-full min-h-[100px]" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="microDescription">Descripción Microscópica</label>
-              <textarea {...register("microDescription")} id="microDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("microDescription")}
+                id="microDescription" 
+                className="border p-2 rounded w-full min-h-[100px]" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="comments">Comentarios</label>
-              <textarea {...register("comments")} id="comments" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("comments")}
+                id="comments" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
-              <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("result")} 
+                id="result" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             <div className="flex justify-center col-span-2">
