@@ -114,7 +114,6 @@ export default function ReportDetail() {
 
   const onSubmit = async (formData) => {
     try {
-      await maybeAddVeterinarianToClient(formData);
       await updateReport(reportId, formData);
       alert("Informe actualizado!");
       navigate("/?view=reports");
