@@ -31,3 +31,14 @@ Content-Type: application/json
 ### DELETE CLIENT
 
 DELETE http://localhost:8080/api/clients/68c2ac79093877decae19d2a
+
+
+### LOGIN USER
+
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "12345678"
+}

@@ -74,6 +74,14 @@ export const dictionary = {
   authorization: {
     status: 403,
     message: "Not authorized"
+  },
+  invalidCredentials: {
+    status: 401,
+    message: "Invalid credentials"
+  },
+  userNotFound: {
+    status: 404,
+    message: "User not found"
   }
 }
 
