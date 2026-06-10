@@ -9,6 +9,7 @@ import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import ReportImages from "../components/ReportImages";
 import { confirmAddVeterinarian } from "../utils/sweetAlerts";
+
 export default function ReportDetail() {
 
   const { n } = useParams();

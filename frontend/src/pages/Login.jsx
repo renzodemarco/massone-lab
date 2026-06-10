@@ -1,32 +1,76 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import Sidebar from "../sections/Sidebar";
-import Welcome from "../sections/Welcome";
-import Reports from "../sections/Reports";
-import Clients from "../sections/Clients";
+import { login } from "../services/auth.js";
 
-function Home() {
+export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const [searchParams] = useSearchParams();
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-  const viewParam = searchParams.get("view");
-  const initialView = viewParam === "reports" || viewParam === "clients" ? viewParam : "welcome";
-  const [currentView, setCurrentView] = useState(initialView);
+    try {
+      setError("");
 
-  const views = {
-    welcome: <Welcome />,
-    reports: <Reports />,
-    clients: <Clients />,
-  };
+      const payload = await login({
+        username,
+        password
+      });
+
+      localStorage.setItem("token", payload.token);
+
+      window.location.reload();
+    } catch (e) {
+      setError(
+        e.response?.data?.message ??
+        "Login failed"
+      );
+    }
+  }
 
   return (
-    <div className="flex min-h-screen bg-[#faf9f6]">
-      <Sidebar view={currentView} setView={setCurrentView} />
-      <div className="flex-1 flex flex-col">
-        {views[currentView]}
-      </div>
+    <div className="min-h-screen min-w-screen flex items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 w-80"
+      >
+        <h1 className="text-2xl font-bold">
+          Login
+        </h1>
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) =>
+            setUsername(e.target.value)
+          }
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+          className="border p-2 rounded"
+        />
+
+        {error && (
+          <p className="text-red-500">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Login
+        </button>
+      </form>
     </div>
   );
 }
-
-export default Home

@@ -4,8 +4,13 @@ import ReportCreate from "./pages/ReportCreate";
 import ReportDetail from "./pages/ReportDetail";
 import ClientDetail from "./pages/ClientDetail" ;
 import ScrollToTop from "./components/ScrollToTop";
+import Login from "./pages/Login"
 
 function App() {
+
+  const token = localStorage.getItem("token");
+
+  if (!token) return <Login />
 
   return (
     <Router>
