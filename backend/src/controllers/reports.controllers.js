@@ -9,7 +9,7 @@ export async function POSTReport(req, res, next) {
     return res.status(201).json({ success: true, payload: report });
   }
   catch (e) {
-    next(e)
+    next(e);
   }
 }
 
