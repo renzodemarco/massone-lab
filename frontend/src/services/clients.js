@@ -28,6 +28,17 @@ export async function getClientById(id) {
   }
 }
 
+export async function createClient(data) {
+  try {
+    const res = await api.post("/clients", data);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e)
+    throw e;
+  }
+}
+
 export async function updateClient(id, data) {
   try {
     const res = await api.put(`/clients/${id}`, data);

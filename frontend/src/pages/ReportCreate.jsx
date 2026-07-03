@@ -10,6 +10,7 @@ import VeterinarianPicker from "../components/VeterinarianPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
 import { confirmAddVeterinarian } from "../utils/sweetAlerts";
+import { cleanPayload } from "../utils/cleanPayload";
 
 export default function ReportCreate() {
 
@@ -114,7 +115,8 @@ export default function ReportCreate() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await postReport(data);
+      const payload = cleanPayload(data);
+      await postReport(payload);
       setTimeout(() => {
         navigate("/?view=reports");
       }, 1000);

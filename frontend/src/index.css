@@ -32,12 +32,10 @@ body {
 
 h1 {
   color: var(--color-text);
-  display: inline;
 }
 
 h2 {
   color: var(--color-primary);
-  display: inline;
 }
 
 /* a {

@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import ReportCreate from "./pages/ReportCreate";
 import ReportDetail from "./pages/ReportDetail";
 import ClientDetail from "./pages/ClientDetail";
+import ClientCreate from "./pages/ClientCreate";
 import ScrollToTop from "./components/ScrollToTop";
 import Login from "./pages/Login";
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/report/new" element={<ReportCreate />} />
           <Route path="/report/:n" element={<ReportDetail />} />
+          <Route path="/client/new" element={<ClientCreate />} />
           <Route path="/client/:id" element={<ClientDetail />} />
         </Routes>
       </div>
