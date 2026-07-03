@@ -17,6 +17,7 @@ router.post("/", middlewares.validateClient, reportsControllers.POSTReport)
 .get("/pdf/:id", validateReportId, reportsControllers.GETpdfReport)
 .get("/:id", validateReportId, reportsControllers.GETReportById)
 .put("/:id", validateReportId, middlewares.validateClient, reportsControllers.PUTReport)
-.delete("/:id", validateReportId, reportsControllers.DELETEReport);
+.delete("/:id", validateReportId, reportsControllers.DELETEReport)
+.get("/mail/test/:id", reportsControllers.SENDReportByEmail);
 
 export default router;

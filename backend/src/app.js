@@ -8,6 +8,7 @@ import usersRouter from "./routes/users.routes.js";
 import notFoundHandler from "./middlewares/not.found.handler.js";
 import errorHandler from "./middlewares/error.handler.js";
 import { authenticate } from "./middlewares/middlewares.js";
+import env from "./config/env.config.js";
 
 const app = express();
 const PORT = config.PORT || 8081;
