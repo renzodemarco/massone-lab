@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { login } from "../services/auth.js";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState("");
 
   async function handleSubmit(e) {
@@ -12,19 +15,12 @@ export default function Login() {
     try {
       setError("");
 
-      const payload = await login({
+      await login({
         username,
-        password
+        password,
       });
-
-      localStorage.setItem("token", payload.token);
-
-      window.location.reload();
     } catch (e) {
-      setError(
-        e.response?.data?.message ??
-        "Login failed"
-      );
+      setError(e.response?.data?.message ?? "Login failed");
     }
   }
 
@@ -35,8 +31,9 @@ export default function Login() {
         className="flex flex-col gap-4 w-80"
       >
         <h1 className="text-2xl font-bold">
-          Login
+          Iniciar sesión
         </h1>
+
 
         <input
           type="text"
@@ -48,27 +45,35 @@ export default function Login() {
           className="border p-2 rounded"
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="border p-2 rounded"
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border p-2 rounded w-full pr-12"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
         {error && (
-          <p className="text-red-500">
+          <i className="text-red-700 text-sm">
             {error}
-          </p>
+          </i>
         )}
 
         <button
           type="submit"
-          className="bg-blue-500 text-white p-2 rounded"
+          className="link-button rounded-lg bg-[#632b91] px-2.5 py-2 font-semibold text-white transition"
         >
-          Login
+          Acceder
         </button>
       </form>
     </div>

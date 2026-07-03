@@ -21,9 +21,9 @@ function Home() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#faf9f6]">
+    <div className="flex body-height bg-[#faf9f6]">
       <Sidebar view={currentView} setView={setCurrentView} />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col py-12">
         {views[currentView]}
       </div>
     </div>
