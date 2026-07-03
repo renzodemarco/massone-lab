@@ -64,3 +64,14 @@ export async function addVeterinarianToClient(id, veterinarians = [], veterinari
     veterinarians: [...veterinarians, normalizedVeterinarian]
   });
 }
+
+export async function destroyClient(id) {
+  try {
+    const res = await api.delete(`/clients/${id}`);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e)
+    throw e;
+  }
+}

@@ -48,7 +48,7 @@ a:hover {
   filter: opacity(1.2);
 } */
 
-button {
+button:not(:disabled) {
   cursor: pointer;
 }
 

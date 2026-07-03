@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClientById, updateClient } from "../services/clients";
+import { getClientById, updateClient, destroyClient } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import { cleanPayload } from "../utils/cleanPayload";
 
@@ -50,13 +50,26 @@ export default function ClientDetail() {
     }
   };
 
+  const onDeleteClient = async () => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este cliente?")) {
+      try {
+        await destroyClient(id);
+        alert("Cliente eliminado");
+        navigate("/?view=clients");
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar");
+      }
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
       <Sidebar back={true} />
 
       <div className="p-6 min-h-screen w-[800px] mx-auto">
         <div className="px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
-          
+
           <h1 className="text-2xl font-bold mb-4">Cliente</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-x-12 gap-y-4 pt-6">
@@ -109,12 +122,19 @@ export default function ClientDetail() {
               </button>
             </div>
 
-            <div className="flex justify-center col-span-2 mt-6">
+            <div className="flex justify-around col-span-2 mt-6">
               <button
                 type="submit"
                 className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button"
               >
                 Guardar Cliente
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
+                onClick={onDeleteClient}
+              >
+                Eliminar Cliente
               </button>
             </div>
 

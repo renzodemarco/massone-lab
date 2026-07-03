@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportByNumber, getReportDueDate, updateReport } from "../services/reports";
+import { getReportByNumber, getReportDueDate, updateReport, destroyReport } from "../services/reports";
 import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
@@ -123,6 +123,19 @@ export default function ReportDetail() {
     } catch (err) {
       console.error(err);
       alert("Error al actualizar");
+    }
+  };
+
+  const onDeleteReport = async () => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este informe?")) {
+      try {
+        await destroyReport(reportId);
+        alert("Informe eliminado");
+        navigate("/?view=reports");
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar");
+      }
     }
   };
 
@@ -329,9 +342,16 @@ export default function ReportDetail() {
               />
             ) : null}
 
-            <div className="flex justify-center col-span-2">
+            <div className="flex justify-around col-span-2">
               <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
                 Guardar Informe
+              </button>
+                            <button
+                type="button"
+                className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
+                onClick={onDeleteReport}
+              >
+                Eliminar Informe
               </button>
             </div>
 
