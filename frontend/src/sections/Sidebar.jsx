@@ -11,7 +11,7 @@ export default function Sidebar({ view, setView }) {
     location.pathname.startsWith("/client/") ? "clients" : "";
 
   return (
-    <div className="flex flex-col gap-2 bg-white p-4 h-full">
+    <div className="flex flex-col gap-2 bg-white p-4 py-12 h-full">
       <div className="flex gap-3 mb-6 items-center">
         <div
           className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10"

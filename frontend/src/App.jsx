@@ -28,7 +28,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="flex-1">
+      <div className="flex-1 h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/report/new" element={<ReportCreate />} />

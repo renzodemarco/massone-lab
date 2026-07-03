@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary:#632b91;
+  --color-primary: #632b91;
   --color-secondary: #99144d;
   --color-background: #faf9f6;
-  --color-text: #333333;  
-  
+  --color-text: #333333;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -16,6 +16,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 body {
@@ -36,7 +40,6 @@ h2 {
   display: inline;
 }
 
-
 /* a {
   font-weight: 500;
   color: var(--color-secondary);
@@ -47,20 +50,29 @@ a:hover {
   filter: opacity(1.2);
 } */
 
-.link-button, .delete-button {
+button {
+  cursor: pointer;
+}
+
+.link-button,
+.delete-button {
   border: solid 2px transparent;
 }
 
 .link-button:not(:disabled):hover {
-  background-color: rgba(99, 43, 145, .05);
+  background-color: rgba(99, 43, 145, 0.05);
   color: var(--color-primary);
   border-color: var(--color-primary);
   cursor: pointer;
 }
 
 .delete-button:not(:disabled):hover {
-  background-color: rgba(99, 43, 145, .05);
+  background-color: rgba(99, 43, 145, 0.05);
   color: var(--color-secondary);
   border-color: var(--color-secondary);
   cursor: pointer;
+}
+
+.body-height {
+  height: calc(100vh - 64px);
 }
