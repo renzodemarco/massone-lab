@@ -9,6 +9,7 @@ import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import ReportImages from "../components/ReportImages";
 import { confirmAddVeterinarian } from "../utils/sweetAlerts";
+import { cleanPayload } from "../utils/cleanPayload";
 
 export default function ReportDetail() {
 
@@ -115,7 +116,8 @@ export default function ReportDetail() {
 
   const onSubmit = async (formData) => {
     try {
-      await updateReport(reportId, formData);
+      const payload = cleanPayload(formData);
+      await updateReport(reportId, payload);
       alert("Informe actualizado!");
       navigate("/?view=reports");
     } catch (err) {
