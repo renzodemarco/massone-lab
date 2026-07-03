@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import UserModel from "./models/users.model.js";
 import env from "./config/env.config.js";
 
-await mongoose.connect("mongodb+srv://renzodemarco:coderhouse@rencluster.iuxqmho.mongodb.net/massone?retryWrites=true&w=majority&appName=RenCluster");
+await mongoose.connect(env.MONGO_URI);
 
 const hashedPassword = await bcrypt.hash(
   "12345678",

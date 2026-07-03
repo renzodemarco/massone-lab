@@ -16,13 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: "http://localhost:5173" }));
 
-app.use("/auth", usersRouter);
-
-app.use("/api", authenticate)
-
-app.use("/api/clients", clientsRouter);
-app.use("/api/reports", reportsRouter);
-
+app.use("/api/auth", usersRouter);
+app.use("/api/clients", authenticate, clientsRouter);
+app.use("/api/reports", authenticate, reportsRouter);
 
 app.use(notFoundHandler);
 
