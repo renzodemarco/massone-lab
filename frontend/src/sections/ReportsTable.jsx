@@ -69,7 +69,6 @@ export default function ReportsTable({ searchParams }) {
             <col className="w-[90px]" />
             <col className="w-[90px]" />
             <col className="w-[90px]" />
-            <col className="w-[90px]" />
           </colgroup>
           <thead>
             <tr className="bg-white text-sm font-medium text-[#111418]">
@@ -80,14 +79,17 @@ export default function ReportsTable({ searchParams }) {
               <th className="px-3 py-3 text-center">Fecha de Entrada</th>
               <th className="px-3 py-3 text-center">Fecha Limite</th>
               <th className="px-3 py-3 text-center">Estado</th>
-              <th className="px-3 py-3 text-center">Editar</th>
-              <th className="px-3 py-3 text-center">Enviar</th>
-              <th className="px-3 py-3 text-center">PDF</th>
+              <th className="px-3 py-3 text-center"></th>
+              <th className="px-3 py-3 text-center"></th>
             </tr>
           </thead>
           <tbody>
             {data?.docs?.map((report, index) => (
-              <tr key={index} className={`border-t border-[#dce0e5] ${report.status === "cancelled" ? "opacity-75" : ""}`}>
+              <tr
+                key={index}
+                onClick={() => navigate(`/report/${report.protocolNumber}`)}
+                className={`border-t border-[#dce0e5] ${report.status === "cancelled" ? "opacity-75" : ""} hover:bg-[#f8fafb] cursor-pointer transition`}
+              >
                 <td className="truncate px-3 py-2 text-center text-sm text-[#111418]">{report.protocolNumber}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{report.studyType}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{report.client?.name || "-"}</td>
@@ -99,14 +101,7 @@ export default function ReportsTable({ searchParams }) {
                   {report.dueDate ? new Date(report.dueDate).toLocaleDateString("es-AR") : "-"}
                 </td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{statusLabel(report.status)}</td>
-                <td className="px-3 py-2 text-center text-sm">
-                  <button
-                    className="link-button rounded-lg bg-[#632b91] px-2.5 py-2 font-semibold text-white transition"
-                    onClick={() => navigate(`/report/${report.protocolNumber}`)}
-                  >
-                    Editar
-                  </button>
-                </td>
+                
                 <td className="px-3 py-2 text-center text-sm">
                   {(() => {
                     const isSending = !!sending[report._id];
@@ -117,7 +112,7 @@ export default function ReportsTable({ searchParams }) {
                         className={`link-button rounded-lg px-2.5 py-2 font-semibold text-white transition ${
                           canSend ? "bg-[#0b8457]" : "bg-[#9ca9a3] opacity-60 cursor-not-allowed"
                         }`}
-                        onClick={() => handleSend(report._id)}
+                        onClick={(e) => { e.stopPropagation(); handleSend(report._id); }}
                       >
                         {isSending ? "Enviando..." : "Enviar"}
                       </button>
@@ -127,9 +122,9 @@ export default function ReportsTable({ searchParams }) {
                 <td className="px-3 py-2 text-center text-sm">
                   <button
                     className="link-button rounded-lg bg-[#632b91] px-2.5 py-2 font-semibold text-white transition"
-                    onClick={() => handlePDF(report._id)}
+                    onClick={(e) => { e.stopPropagation(); handlePDF(report._id); }}
                   >
-                    PDF
+                    Ver PDF
                   </button>
                 </td>
               </tr>
