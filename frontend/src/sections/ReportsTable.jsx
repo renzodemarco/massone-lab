@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
-import { generatePDF, getReports } from "../services/reports";
+import { generatePDF, getReports, sendTestMail } from "../services/reports";
 
 export default function ReportsTable({ searchParams }) {
   const [data, setData] = useState({ docs: [] });
   const [page, setPage] = useState(1);
+  const [sending, setSending] = useState({});
   const navigate = useNavigate();
 
   const statusLabel = (status) => {
@@ -37,6 +38,23 @@ export default function ReportsTable({ searchParams }) {
     }
   };
 
+  const handleSend = async (id) => {
+    setSending((s) => ({ ...s, [id]: true }));
+    try {
+      await sendTestMail(id);
+      setData((prev) => ({
+        ...prev,
+        docs: prev.docs.map((r) => (r._id === id ? { ...r, status: "sent" } : r)),
+      }));
+      alert("Correo enviado");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || err.message || "Error al enviar correo");
+    } finally {
+      setSending((s) => ({ ...s, [id]: false }));
+    }
+  };
+
   return (
     <>
       <div className="overflow-x-auto rounded-lg border border-[#dce0e5] bg-white">
@@ -51,6 +69,7 @@ export default function ReportsTable({ searchParams }) {
             <col className="w-[90px]" />
             <col className="w-[90px]" />
             <col className="w-[90px]" />
+            <col className="w-[90px]" />
           </colgroup>
           <thead>
             <tr className="bg-white text-sm font-medium text-[#111418]">
@@ -62,6 +81,7 @@ export default function ReportsTable({ searchParams }) {
               <th className="px-3 py-3 text-center">Fecha Limite</th>
               <th className="px-3 py-3 text-center">Estado</th>
               <th className="px-3 py-3 text-center">Editar</th>
+              <th className="px-3 py-3 text-center">Enviar</th>
               <th className="px-3 py-3 text-center">PDF</th>
             </tr>
           </thead>
@@ -86,6 +106,23 @@ export default function ReportsTable({ searchParams }) {
                   >
                     Editar
                   </button>
+                </td>
+                <td className="px-3 py-2 text-center text-sm">
+                  {(() => {
+                    const isSending = !!sending[report._id];
+                    const canSend = report.status === "finished" && !isSending;
+                    return (
+                      <button
+                        disabled={!canSend}
+                        className={`link-button rounded-lg px-2.5 py-2 font-semibold text-white transition ${
+                          canSend ? "bg-[#0b8457]" : "bg-[#9ca9a3] opacity-60 cursor-not-allowed"
+                        }`}
+                        onClick={() => handleSend(report._id)}
+                      >
+                        {isSending ? "Enviando..." : "Enviar"}
+                      </button>
+                    );
+                  })()}
                 </td>
                 <td className="px-3 py-2 text-center text-sm">
                   <button
