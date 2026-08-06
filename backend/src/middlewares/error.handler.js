@@ -1,4 +1,4 @@
-import env from "./config/env.config.js";
+import env from "../config/env.config.js";
 
 export default function (error, req, res, next) {
     const status = error.status || 500;
