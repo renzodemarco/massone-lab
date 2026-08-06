@@ -1,6 +1,6 @@
 import * as reportsServices from "../services/reports.services.js";
 import * as mailServices from "../services/mails.services.js";
-import { createReportSchema, dueDateQuerySchema, updateReportSchema } from "../schemas/reports.schema.js";
+import { createReportSchema, dueDateQuerySchema, updateReportSchema, finishReportSchema } from "../schemas/reports.schema.js";
 
 export async function POSTReport(req, res, next) {
   try {
@@ -170,6 +170,32 @@ export async function SENDReportByEmail(req, res, next) {
     // await reportsServices.updateReportStatus(id, "sent");
 
     return res.status(200).json({ message: "Report sent successfully" });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function FINISHReport(req, res, next) {
+try {
+    const { id } = req.params;
+    const report = await reportsServices.getReportById(id);
+
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Report not found' });
+    }
+
+    const { error } = finishReportSchema.validate(report, { abortEarly: false });
+
+    if (error) {
+      const missing = error.details.map(d => d.path.join('.'));
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missing.join(', ')}`,
+      });
+    }
+
+    const updated = await reportsServices.updateReport(id, { status: 'finished' });
+    return res.status(200).json({ success: true, payload: updated });
   } catch (e) {
     next(e);
   }

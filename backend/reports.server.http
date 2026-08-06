@@ -66,3 +66,7 @@ GET http://localhost:8080/api/reports/pdf/68c2c5c1d1af9caec912b17f
 ### GET SEND MAIL
 
 GET http://localhost:8080/api/reports/mail/test/6a05ea524f6d4a3a4f5762ad
+
+
+### POST FINISH REPORT
+POST http://localhost:8080/api/reports/finish/69ecdf14be36fdd7d8e861da
