@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FormError from "./FormError";
 
 export default function VeterinarianPicker({
@@ -6,6 +6,7 @@ export default function VeterinarianPicker({
   value,
   onChange,
   error,
+  onAdd,
   disabled = false,
   id = "veterinarian",
   placeholder = "Buscar veterinario...",
@@ -13,21 +14,15 @@ export default function VeterinarianPicker({
   const containerRef = useRef(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const normalizedVeterinarians = veterinarians.map((veterinarian) => veterinarian.trim()).filter(Boolean);
+  const normalizedVeterinarians = useMemo(() => {
+    return veterinarians
+      .map((veterinarian) => veterinarian.trim())
+      .filter(Boolean);
+  }, [veterinarians]);
 
   useEffect(() => {
-    if (normalizedVeterinarians.includes(value)) {
-      setQuery(value);
-      return;
-    }
-
-    if (value) {
-      setQuery("Veterinario no encontrado");
-      return;
-    }
-
-    setQuery("");
-  }, [normalizedVeterinarians, value]);
+    setQuery(value || "");
+  }, [value]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -50,10 +45,7 @@ export default function VeterinarianPicker({
     const nextValue = event.target.value;
     setQuery(nextValue);
     setOpen(true);
-
-    if (value !== nextValue) {
-      onChange("");
-    }
+    onChange(nextValue);
   };
 
   const handleSelect = (veterinarian) => {
@@ -77,6 +69,13 @@ export default function VeterinarianPicker({
           type="text"
           value={query}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.stopPropagation();
+              onAdd?.(query);
+            }
+          }}
           onFocus={() => !disabled && setOpen(true)}
           placeholder={disabled ? "Seleccione un cliente primero" : placeholder}
           autoComplete="off"

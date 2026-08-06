@@ -28,9 +28,46 @@ export async function getClientById(id) {
   }
 }
 
+export async function createClient(data) {
+  try {
+    const res = await api.post("/clients", data);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e)
+    throw e;
+  }
+}
+
 export async function updateClient(id, data) {
   try {
     const res = await api.put(`/clients/${id}`, data);
+    return res.data.payload;
+  }
+  catch (e) {
+    console.error(e.response?.data ?? e.message ?? e)
+    throw e;
+  }
+}
+
+export async function addVeterinarianToClient(id, veterinarians = [], veterinarian) {
+  const normalizedVeterinarian = veterinarian?.trim();
+  if (!normalizedVeterinarian) return null;
+
+  const exists = veterinarians.some(
+    (item) => item.trim().toLowerCase() === normalizedVeterinarian.toLowerCase()
+  );
+
+  if (exists) return null;
+
+  return await updateClient(id, {
+    veterinarians: [...veterinarians, normalizedVeterinarian]
+  });
+}
+
+export async function destroyClient(id) {
+  try {
+    const res = await api.delete(`/clients/${id}`);
     return res.data.payload;
   }
   catch (e) {

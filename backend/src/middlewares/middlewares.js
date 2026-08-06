@@ -3,8 +3,10 @@ import multer from "multer";
 import CustomError from "../utils/custom.error.js";
 import dictionary from "../utils/error.dictionary.js";
 import mongoose from "mongoose";
+import env from "../config/env.config.js";
+import jwt from 'jsonwebtoken'
 
-const REPORT_IMAGE_MAX_FILES = 6;
+const REPORT_IMAGE_MAX_FILES = 4;
 const REPORT_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
 
 export function validateObjectIdParam(paramName, errorKey = "invalidQuery") {
@@ -74,4 +76,22 @@ export function uploadReportImages(req, res, next) {
 
     next(error);
   });
+}
+
+export function authenticate(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) CustomError.new(dictionary.authorization);
+    const token = authHeader.split(" ")[1];
+
+    const payload = jwt.verify(token, env.JWT_SECRET);
+    if (!payload) CustomError.new(dictionary.authorization);
+
+    req.user = payload;
+
+    next();
+
+  } catch (error) {
+    next(error);
+  }
 }

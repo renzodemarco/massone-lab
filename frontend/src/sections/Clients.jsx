@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import ClientsTable from "./ClientsTable"
 
 function Clients() {
+  const navigate = useNavigate();
   const [queryInput, setQueryInput] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
 
@@ -17,8 +19,15 @@ function Clients() {
 
   return (
     <>
-      <div className="px-4 py-3">
+      <div className="px-4 py-3 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[#111418]">Clientes</h1>
+        <button
+          type="button"
+          onClick={() => navigate("/client/new")}
+          className="bg-[#632b91] text-white px-4 py-2 rounded-lg transition font-bold link-button"
+        >
+          Crear Cliente
+        </button>
       </div>
       <div className="px-4 py-3">
         <SearchBar

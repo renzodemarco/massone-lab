@@ -67,7 +67,7 @@ export default function ReportsTable({ searchParams }) {
           </thead>
           <tbody>
             {data?.docs?.map((report, index) => (
-              <tr key={index} className="border-t border-[#dce0e5]">
+              <tr key={index} className={`border-t border-[#dce0e5] ${report.status === "cancelled" ? "opacity-75" : ""}`}>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#111418]">{report.protocolNumber}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{report.studyType}</td>
                 <td className="truncate px-3 py-2 text-center text-sm text-[#637588]">{report.client?.name || "-"}</td>

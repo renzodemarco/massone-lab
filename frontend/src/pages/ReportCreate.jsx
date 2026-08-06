@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getClientById, getClients } from "../services/clients";
+import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import { getReportDueDate, postReport } from "../services/reports";
 import getNextReportNumber from "../utils/getNextProtocolNumber";
 import FormError from "../components/FormError";
@@ -9,6 +9,9 @@ import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import Sidebar from "../sections/Sidebar";
 import Loading from "../components/Loading";
+import { confirmAddVeterinarian } from "../utils/sweetAlerts";
+import { cleanPayload } from "../utils/cleanPayload";
+
 export default function ReportCreate() {
 
   const [clients, setClients] = useState([]);
@@ -89,10 +92,31 @@ export default function ReportCreate() {
       });
   }, [selectedClient]);
 
+  const maybeAddVeterinarianToClient = async (data) => {
+    const veterinarian = data.veterinarian?.trim();
+    if (!data.client || !veterinarian) return;
+
+    const alreadyExists = clientVeterinarians.some(
+      (item) => item.trim().toLowerCase() === veterinarian.toLowerCase()
+    );
+
+    if (alreadyExists) return;
+
+    const shouldAdd = await confirmAddVeterinarian(veterinarian);
+
+    if (!shouldAdd) return;
+
+    const updatedClient = await addVeterinarianToClient(data.client, clientVeterinarians, veterinarian);
+    if (updatedClient?.veterinarians) {
+      setClientVeterinarians(updatedClient.veterinarians);
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await postReport(data);
+      const payload = cleanPayload(data);
+      await postReport(payload);
       setTimeout(() => {
         navigate("/?view=reports");
       }, 1000);
@@ -109,7 +133,12 @@ export default function ReportCreate() {
       <div className="p-6 min-h-screen w-[1000px] mx-auto">
         <div className=" px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
           <h1 className="text-3xl font-bold mb-4">Crear Informe</h1>
-          <form onSubmit={handleSubmit(onSubmit)} className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4">
+          <form 
+          onSubmit={handleSubmit(onSubmit)} 
+          className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
@@ -173,6 +202,7 @@ export default function ReportCreate() {
                 veterinarians={clientVeterinarians}
                 value={selectedVeterinarian}
                 onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true, shouldValidate: true })}
+                onAdd={(inputValue) => maybeAddVeterinarianToClient({client: selectedClient, veterinarian: inputValue})}
                 error={errors.veterinarian?.message}
                 disabled={!selectedClient}
               />
@@ -273,27 +303,52 @@ export default function ReportCreate() {
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="sampleInfo">Muestra Remitida</label>
-              <textarea {...register("sampleInfo")} id="sampleInfo" className="border p-2 rounded w-full" />
+              <textarea
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("sampleInfo")}
+                id="sampleInfo"
+                className="border p-2 rounded w-full"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="macroDescription">Descripción Macroscópica</label>
-              <textarea {...register("macroDescription")} id="macroDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("macroDescription")}
+                id="macroDescription" 
+                className="border p-2 rounded w-full min-h-[100px]" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="microDescription">Descripción Microscópica</label>
-              <textarea {...register("microDescription")} id="microDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("microDescription")}
+                id="microDescription" 
+                className="border p-2 rounded w-full min-h-[100px]" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="comments">Comentarios</label>
-              <textarea {...register("comments")} id="comments" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("comments")}
+                id="comments" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
-              <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("result")} 
+                id="result" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             <div className="flex justify-center col-span-2">

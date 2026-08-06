@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { deleteReportImage, uploadReportImages } from "../services/reports";
 
+const REPORT_IMAGE_LIMIT = 4;
+
 export default function ReportImages({ reportId, images = [], onImagesChange }) {
+  const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingImageId, setDeletingImageId] = useState(null);
@@ -20,9 +23,23 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
     };
   }, [previews]);
 
+  const resetFileSelection = () => {
+    setSelectedFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files || []);
+    const remainingSlots = Math.max(REPORT_IMAGE_LIMIT - images.length, 0);
     setError("");
+
+    if (files.length > remainingSlots) {
+      setError(`Este informe puede tener hasta ${REPORT_IMAGE_LIMIT} imagenes en total. Te quedan ${remainingSlots} lugar(es).`);
+      setSelectedFiles(files.slice(0, remainingSlots));
+      event.target.value = "";
+      return;
+    }
+
     setSelectedFiles(files);
   };
 
@@ -34,7 +51,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
       setError("");
       const nextImages = await uploadReportImages(reportId, selectedFiles);
       onImagesChange(nextImages);
-      setSelectedFiles([]);
+      resetFileSelection();
     } catch (err) {
       setError(err.response?.data?.message || "No se pudieron subir las imagenes.");
     } finally {
@@ -58,6 +75,9 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
   };
 
   const totalAfterUpload = images.length + selectedFiles.length;
+  const remainingSlots = Math.max(REPORT_IMAGE_LIMIT - images.length, 0);
+  const hasReachedImageLimit = remainingSlots === 0;
+  const canChooseImages = !hasReachedImageLimit && !isUploading;
 
   return (
     <section className="col-span-2 mt-4 rounded-lg border border-[#dce0e5] bg-[#fcfcfb] p-5">
@@ -65,38 +85,59 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
         <div>
           <h2 className="text-2xl font-bold">Imagenes</h2>
           <p className="text-sm text-gray-500">
-            Hasta 6 por subida y 5 MB por archivo.
+            Hasta {REPORT_IMAGE_LIMIT} imagenes por informe, 5 MB por archivo.
           </p>
         </div>
         <p className="text-sm text-gray-500">
-          {images.length} guardadas{selectedFiles.length ? ` + ${selectedFiles.length} pendientes` : ""}
+          {images.length} de {REPORT_IMAGE_LIMIT} guardadas{selectedFiles.length ? ` + ${selectedFiles.length} pendientes` : ""}
         </p>
       </div>
 
       <div className="mt-4 flex flex-col gap-3 rounded-lg border border-dashed border-[#cdbfdb] bg-white p-4">
-        <label className="block text-sm font-medium text-[#333333]" htmlFor="report-images-input">
-          Seleccionar imagenes
-        </label>
         <input
+          ref={fileInputRef}
           id="report-images-input"
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
-          className="block w-full rounded border border-[#dce0e5] p-2"
+          disabled={hasReachedImageLimit || isUploading}
+          className="sr-only"
         />
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <label
+            htmlFor="report-images-input"
+            aria-disabled={!canChooseImages}
+            className={`inline-flex w-fit items-center justify-center rounded-lg border-2 px-5 py-2.5 font-semibold transition ${
+              canChooseImages
+                ? "link-button cursor-pointer border-[#632b91] bg-[#632b91] text-white"
+                : "cursor-not-allowed border-[#dce0e5] bg-[#f4f4f2] text-gray-400"
+            }`}
+          >
+            Elegir imagenes
+          </label>
+          <p className="text-sm font-medium text-[#637588]">
+            {hasReachedImageLimit
+              ? "Cupo completo"
+              : `${remainingSlots} lugar(es) disponible(s)`}
+          </p>
+        </div>
+
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <p className="text-sm text-gray-500">
             {selectedFiles.length
               ? `${selectedFiles.length} archivo(s) listo(s) para subir. Total visible: ${totalAfterUpload}.`
-              : "Todavia no seleccionaste imagenes nuevas."}
+              : hasReachedImageLimit
+                ? `Este informe ya tiene el maximo de ${REPORT_IMAGE_LIMIT} imagenes.`
+                : `Todavia no seleccionaste imagenes nuevas. Quedan ${remainingSlots} lugar(es).`}
           </p>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => {
-                setSelectedFiles([]);
                 setError("");
+                resetFileSelection();
               }}
               disabled={!selectedFiles.length || isUploading}
               className="delete-button rounded-lg border border-[#99144d] px-4 py-2 font-semibold text-[#99144d] transition disabled:cursor-not-allowed disabled:opacity-50"
@@ -106,7 +147,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
             <button
               type="button"
               onClick={handleUpload}
-              disabled={!selectedFiles.length || isUploading}
+              disabled={!selectedFiles.length || isUploading || hasReachedImageLimit}
               className="link-button rounded-lg bg-[#632b91] px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isUploading ? "Subiendo..." : "Subir imagenes"}
@@ -128,7 +169,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
           </h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {previews.map((preview) => (
-              <article key={preview.url} className="overflow-hidden rounded-lg border border-[#ebe6f1] bg-white">
+              <article key={preview.url} className="overflow-hidden rounded-lg border border-[#ebe6f1] bg-white opacity-80">
                 <img src={preview.url} alt={preview.name} className="h-40 w-full object-cover" />
                 <div className="border-t border-[#ebe6f1] px-3 py-2">
                   <p className="truncate text-sm text-gray-600">{preview.name}</p>

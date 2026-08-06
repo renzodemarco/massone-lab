@@ -37,7 +37,7 @@ export const dictionary = {
   },
   reportImagesLimitExceeded: {
     status: 400,
-    message: "A report can include up to 6 images per upload"
+    message: "A report can include up to 4 images"
   },
   reportImageTooLarge: {
     status: 400,
@@ -74,6 +74,14 @@ export const dictionary = {
   authorization: {
     status: 403,
     message: "Not authorized"
+  },
+  invalidCredentials: {
+    status: 401,
+    message: "Invalid credentials"
+  },
+  userNotFound: {
+    status: 404,
+    message: "User not found"
   }
 }
 

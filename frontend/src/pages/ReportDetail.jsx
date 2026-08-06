@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportByNumber, getReportDueDate, updateReport } from "../services/reports";
-import { getClientById, getClients } from "../services/clients";
+import { getReportByNumber, getReportDueDate, updateReport, destroyReport } from "../services/reports";
+import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
 import ClientPicker from "../components/ClientPicker";
 import VeterinarianPicker from "../components/VeterinarianPicker";
 import ReportImages from "../components/ReportImages";
+import { confirmAddVeterinarian } from "../utils/sweetAlerts";
+import { cleanPayload } from "../utils/cleanPayload";
+
 export default function ReportDetail() {
 
   const { n } = useParams();
@@ -91,14 +94,48 @@ export default function ReportDetail() {
       });
   }, [selectedClient]);
 
+  const maybeAddVeterinarianToClient = async (data) => {
+    const veterinarian = data.veterinarian?.trim();
+    if (!data.client || !veterinarian) return;
+
+    const alreadyExists = clientVeterinarians.some(
+      (item) => item.trim().toLowerCase() === veterinarian.toLowerCase()
+    );
+
+    if (alreadyExists) return;
+
+    const shouldAdd = await confirmAddVeterinarian(veterinarian);
+
+    if (!shouldAdd) return;
+
+    const updatedClient = await addVeterinarianToClient(data.client, clientVeterinarians, veterinarian);
+    if (updatedClient?.veterinarians) {
+      setClientVeterinarians(updatedClient.veterinarians);
+    }
+  };
+
   const onSubmit = async (formData) => {
     try {
-      await updateReport(reportId, formData);
+      const payload = cleanPayload(formData);
+      await updateReport(reportId, payload);
       alert("Informe actualizado!");
       navigate("/?view=reports");
     } catch (err) {
       console.error(err);
       alert("Error al actualizar");
+    }
+  };
+
+  const onDeleteReport = async () => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este informe?")) {
+      try {
+        await destroyReport(reportId);
+        alert("Informe eliminado");
+        navigate("/?view=reports");
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar");
+      }
     }
   };
 
@@ -108,7 +145,12 @@ export default function ReportDetail() {
       <div className="p-6 min-h-screen w-[1000px] mx-auto">
         <div className="px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
           <h1 className="text-2xl font-bold mb-4">Informe {n}</h1>
-          <form onSubmit={handleSubmit(onSubmit)} className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="pt-8 grid grid-cols-2 gap-x-12 gap-y-4"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
@@ -163,6 +205,7 @@ export default function ReportDetail() {
                 veterinarians={clientVeterinarians}
                 value={selectedVeterinarian}
                 onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true })}
+                onAdd={(inputValue) => maybeAddVeterinarianToClient({ client: selectedClient, veterinarian: inputValue })}
                 error={errors.veterinarian?.message}
                 disabled={!selectedClient}
               />
@@ -243,27 +286,52 @@ export default function ReportDetail() {
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="sampleInfo">Muestra Remitida</label>
-              <textarea {...register("sampleInfo")} id="sampleInfo" className="border p-2 rounded w-full" />
+              <textarea
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("sampleInfo")}
+                id="sampleInfo"
+                className="border p-2 rounded w-full"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="macroDescription">Descripción Macroscópica</label>
-              <textarea {...register("macroDescription")} id="macroDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("macroDescription")}
+                id="macroDescription"
+                className="border p-2 rounded w-full min-h-[100px]"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="microDescription">Descripción Microscópica</label>
-              <textarea {...register("microDescription")} id="microDescription" className="border p-2 rounded w-full min-h-[100px]" />
+              <textarea
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("microDescription")}
+                id="microDescription"
+                className="border p-2 rounded w-full min-h-[100px]"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="comments">Comentarios</label>
-              <textarea {...register("comments")} id="comments" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("comments")}
+                id="comments" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             <div className="col-span-2">
               <label className="block mb-1 font-medium" htmlFor="result">Diagnóstico</label>
-              <textarea {...register("result")} id="result" className="border p-2 rounded w-full" />
+              <textarea 
+                onKeyDown={(e) => e.stopPropagation()}
+                {...register("result")} 
+                id="result" 
+                className="border p-2 rounded w-full" 
+              />
             </div>
 
             {reportId ? (
@@ -274,9 +342,16 @@ export default function ReportDetail() {
               />
             ) : null}
 
-            <div className="flex justify-center col-span-2">
+            <div className="flex justify-around col-span-2">
               <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
                 Guardar Informe
+              </button>
+                            <button
+                type="button"
+                className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
+                onClick={onDeleteReport}
+              >
+                Eliminar Informe
               </button>
             </div>
 

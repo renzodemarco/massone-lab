@@ -1,65 +1,46 @@
-import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { useParams, useNavigate } from "react-router-dom";
-import { getClientById, updateClient, destroyClient } from "../services/clients";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../sections/Sidebar";
-import { cleanPayload } from "../utils/cleanPayload";
+import { createClient } from "../services/clients";
 
-export default function ClientDetail() {
-
-  const { id } = useParams();
+export default function ClientCreate() {
   const navigate = useNavigate();
 
-  const { register, handleSubmit, reset, control } = useForm();
+  const { register, handleSubmit, control, reset } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      address: "",
+      phone: "",
+      veterinarians: [""],
+    },
+  });
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "veterinarians"
+    name: "veterinarians",
   });
-
-  useEffect(() => {
-    getClientById(id)
-      .then(data => {
-        console.log(data);
-        reset({
-          name: data.name || "",
-          email: data.email || "",
-          address: data.address || "",
-          phone: data.phone || "",
-          veterinarians: data.veterinarians || []
-        });
-      })
-      .catch(console.error);
-  }, [id, reset]);
 
   const onSubmit = async (formData) => {
     try {
-      const payload = cleanPayload({
-        ...formData,
-        veterinarians: (formData.veterinarians || []).filter(
-          (value) => typeof value === "string" && value.trim()
-        ),
-      });
+      const payload = Object.fromEntries(
+        Object.entries(formData).filter(([key, value]) => {
+          if (key === "veterinarians") return true;
+          if (typeof value === "string") return value.trim() !== "";
+          return value !== undefined && value !== null;
+        })
+      );
 
-      await updateClient(id, payload);
-      alert("Cliente actualizado");
+      payload.veterinarians = (formData.veterinarians || []).filter(
+        (value) => typeof value === "string" && value.trim()
+      );
+
+      await createClient(payload);
+      reset();
       navigate("/?view=clients");
     } catch (err) {
       console.error(err);
-      alert("Error al actualizar");
-    }
-  };
-
-  const onDeleteClient = async () => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este cliente?")) {
-      try {
-        await destroyClient(id);
-        alert("Cliente eliminado");
-        navigate("/?view=clients");
-      } catch (err) {
-        console.error(err);
-        alert("Error al eliminar");
-      }
+      alert("Error al crear el cliente");
     }
   };
 
@@ -69,19 +50,25 @@ export default function ClientDetail() {
 
       <div className="p-6 min-h-screen w-[800px] mx-auto">
         <div className="px-10 py-6 overflow-hidden rounded-lg border border-[#dce0e5] bg-white">
-
-          <h1 className="text-2xl font-bold mb-4">Cliente</h1>
+          <h1 className="text-2xl font-bold mb-4">Crear Cliente</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-x-12 gap-y-4 pt-6">
-
             <div>
               <label className="block mb-1 font-medium" htmlFor="name">Nombre</label>
-              <input {...register("name")} id="name" className="border p-2 rounded w-full" />
+              <input
+                {...register("name", { required: "El nombre es obligatorio" })}
+                id="name"
+                className="border p-2 rounded w-full"
+              />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="email">Email</label>
-              <input {...register("email")} id="email" className="border p-2 rounded w-full" />
+              <input
+                {...register("email", { required: "El email es obligatorio" })}
+                id="email"
+                className="border p-2 rounded w-full"
+              />
             </div>
 
             <div>
@@ -102,6 +89,7 @@ export default function ClientDetail() {
                   <input
                     {...register(`veterinarians.${idx}`)}
                     className="border p-2 rounded w-full"
+                    placeholder="Nombre del veterinario"
                   />
                   <button
                     type="button"
@@ -122,24 +110,15 @@ export default function ClientDetail() {
               </button>
             </div>
 
-            <div className="flex justify-around col-span-2 mt-6">
+            <div className="flex justify-center col-span-2 mt-6">
               <button
                 type="submit"
                 className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button"
               >
-                Guardar Cliente
-              </button>
-              <button
-                type="button"
-                className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
-                onClick={onDeleteClient}
-              >
-                Eliminar Cliente
+                Crear Cliente
               </button>
             </div>
-
           </form>
-
         </div>
       </div>
     </div>
