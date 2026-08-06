@@ -8,6 +8,7 @@ import usersRouter from "./routes/users.routes.js";
 import notFoundHandler from "./middlewares/not.found.handler.js";
 import errorHandler from "./middlewares/error.handler.js";
 import { authenticate } from "./middlewares/middlewares.js";
+import env from "./config/env.config.js";
 
 const app = express();
 const PORT = config.PORT || 8081;
@@ -17,8 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: "http://localhost:5173" }));
 
 app.use("/api/auth", usersRouter);
-app.use("/api/clients", authenticate, clientsRouter);
-app.use("/api/reports", authenticate, reportsRouter);
+app.use("/api/clients", clientsRouter);
+app.use("/api/reports", reportsRouter);
 
 app.use(notFoundHandler);
 

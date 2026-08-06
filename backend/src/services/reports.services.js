@@ -12,7 +12,7 @@ import { isValidImageBuffer } from '../utils/is.valid.image.buffer.js';
 const REPORT_IMAGE_MAX_FILES = 4;
 
 function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.replace(/[.*+?^${}()<>|[\]\\]/g, '\\$&');
 }
 
 async function uploadFileToCloudinary(file, reportId) {

@@ -79,3 +79,18 @@ export const dueDateQuerySchema = Joi.object({
     .required()
 });
 
+export const finishReportSchema = Joi.object({
+  protocolNumber: Joi.string().trim().min(1).required(),
+  studyType: Joi.string().trim().min(1).required(),
+  entryDate: Joi.alternatives()
+    .try(Joi.date(), Joi.string().trim().min(1))
+    .required(),
+  patient: Joi.object({
+    sex: Joi.string().trim().min(1).required(),
+  })
+    .required()
+    .unknown(true),
+  sampleInfo: Joi.string().trim().min(1).required(),
+  microDescription: Joi.string().trim().min(1).required(),
+  result: Joi.string().trim().min(1).required(),
+}).unknown(true);

@@ -1,5 +1,6 @@
 import * as reportsServices from "../services/reports.services.js";
-import { createReportSchema, dueDateQuerySchema, updateReportSchema } from "../schemas/reports.schema.js";
+import * as mailServices from "../services/mails.services.js";
+import { createReportSchema, dueDateQuerySchema, updateReportSchema, finishReportSchema } from "../schemas/reports.schema.js";
 
 export async function POSTReport(req, res, next) {
   try {
@@ -135,3 +136,67 @@ export async function GETpdfReport(req, res, next) {
     next(e);
   }
 };
+
+export async function SENDReportByEmail(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "Missing report id" });
+    }
+
+    // 1. Generar PDF en memoria
+    const pdfBuffer = await reportsServices.generateReport(id);
+
+    if (!pdfBuffer) {
+      return res.status(404).json({ message: "Report not found or PDF could not be generated" });
+    }
+
+    // 2. Obtener datos del report (para email destino)
+    const report = await reportsServices.getReportById(id);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // 3. Enviar mail
+    await mailServices.sendReportEmail({
+      to: report.client.email,
+      reportNumber: report.protocolNumber,
+      pdfBuffer,
+    });
+
+    // 4. (opcional) actualizar estado
+    // await reportsServices.updateReportStatus(id, "sent");
+
+    return res.status(200).json({ message: "Report sent successfully" });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function FINISHReport(req, res, next) {
+try {
+    const { id } = req.params;
+    const report = await reportsServices.getReportById(id);
+
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Report not found' });
+    }
+
+    const { error } = finishReportSchema.validate(report, { abortEarly: false });
+
+    if (error) {
+      const missing = error.details.map(d => d.path.join('.'));
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missing.join(', ')}`,
+      });
+    }
+
+    const updated = await reportsServices.updateReport(id, { status: 'finished' });
+    return res.status(200).json({ success: true, payload: updated });
+  } catch (e) {
+    next(e);
+  }
+}
