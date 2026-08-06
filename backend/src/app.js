@@ -1,5 +1,7 @@
 import express from "express";
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import config from "./config/env.config.js";
 import connectDB from './config/mongo.config.js';
 import clientsRouter from "./routes/clients.routes.js";
@@ -13,9 +15,19 @@ import env from "./config/env.config.js";
 const app = express();
 const PORT = config.PORT || 8081;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://localhost:5173" }));
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests, please try again later." }
+});
+
+app.use(helmet());
+app.use(apiLimiter);
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cors({ origin: env.FRONTEND_URL, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
 
 app.use("/api/auth", usersRouter);
 app.use("/api/clients", authenticate, clientsRouter);
