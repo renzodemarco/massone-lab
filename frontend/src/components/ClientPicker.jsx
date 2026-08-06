@@ -8,6 +8,7 @@ export default function ClientPicker({
   error,
   id = "client",
   placeholder = "Buscar cliente...",
+  disabled = false,
 }) {
   const containerRef = useRef(null);
   const [query, setQuery] = useState("");
@@ -83,13 +84,15 @@ export default function ClientPicker({
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full rounded border p-2 pr-10"
+          disabled={disabled}
+          className={`w-full rounded border p-2 pr-10 ${disabled ? "report-finished-field" : ""}`}
         />
         {query && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute inset-y-0 right-2 text-sm text-[#637588]"
+            className={`absolute inset-y-0 right-2 text-sm ${disabled ? "text-[#7c7289]" : "text-[#637588]"}`}
+            disabled={disabled}
             aria-label="Limpiar cliente"
           >
             Limpiar

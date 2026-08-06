@@ -3,7 +3,7 @@ import { deleteReportImage, uploadReportImages } from "../services/reports";
 
 const REPORT_IMAGE_LIMIT = 4;
 
-export default function ReportImages({ reportId, images = [], onImagesChange }) {
+export default function ReportImages({ reportId, images = [], onImagesChange, disabled = false }) {
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -101,7 +101,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
           accept="image/*"
           multiple
           onChange={handleFileChange}
-          disabled={hasReachedImageLimit || isUploading}
+          disabled={disabled || hasReachedImageLimit || isUploading}
           className="sr-only"
         />
 
@@ -110,7 +110,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
             htmlFor="report-images-input"
             aria-disabled={!canChooseImages}
             className={`inline-flex w-fit items-center justify-center rounded-lg border-2 px-5 py-2.5 font-semibold transition ${
-              canChooseImages
+              canChooseImages && !disabled
                 ? "link-button cursor-pointer border-[#632b91] bg-[#632b91] text-white"
                 : "cursor-not-allowed border-[#dce0e5] bg-[#f4f4f2] text-gray-400"
             }`}
@@ -139,7 +139,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
                 setError("");
                 resetFileSelection();
               }}
-              disabled={!selectedFiles.length || isUploading}
+              disabled={disabled || !selectedFiles.length || isUploading}
               className="delete-button rounded-lg border border-[#99144d] px-4 py-2 font-semibold text-[#99144d] transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               Limpiar
@@ -147,7 +147,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
             <button
               type="button"
               onClick={handleUpload}
-              disabled={!selectedFiles.length || isUploading || hasReachedImageLimit}
+              disabled={disabled || !selectedFiles.length || isUploading || hasReachedImageLimit}
               className="link-button rounded-lg bg-[#632b91] px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isUploading ? "Subiendo..." : "Subir imagenes"}
@@ -203,7 +203,7 @@ export default function ReportImages({ reportId, images = [], onImagesChange }) 
                   <button
                     type="button"
                     onClick={() => handleDelete(image._id)}
-                    disabled={deletingImageId === image._id || isUploading}
+                    disabled={disabled || deletingImageId === image._id || isUploading}
                     className="delete-button rounded-lg border border-[#99144d] px-3 py-1.5 text-sm font-semibold text-[#99144d] transition disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {deletingImageId === image._id ? "Eliminando..." : "Eliminar"}

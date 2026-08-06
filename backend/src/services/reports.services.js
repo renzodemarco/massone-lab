@@ -54,7 +54,7 @@ async function destroyCloudinaryImage(publicId) {
 export async function createReport(data) {
   const existing = await ReportsModel.findOne({ protocolNumber: data.protocolNumber }).lean();
   if (existing) CustomError.new(dictionary.protocolNumberExists);
-  return await ReportsModel.create(data);
+  return await ReportsModel.create({ ...data, status: data.status || 'entered' });
 }
 
 export async function getReports(filters) {
@@ -116,6 +116,13 @@ export async function updateReport(id, data) {
 
   if (data.entryDate || data.studyType) {
     data.dueDate = calculateDueDate(finalEntryDate, finalStudyType);
+  }
+
+  if (existing.status === 'entered' && (!data.status || data.status === 'entered')) {
+    const hasEditableChanges = Object.keys(data).some((key) => key !== 'status');
+    if (hasEditableChanges) {
+      data.status = 'started';
+    }
   }
 
   if (data.protocolNumber) {

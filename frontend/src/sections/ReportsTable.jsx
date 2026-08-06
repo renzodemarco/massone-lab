@@ -43,11 +43,11 @@ export default function ReportsTable({ searchParams }) {
   const handleSend = async (id) => {
     setSending((s) => ({ ...s, [id]: true }));
     try {
-      await sendTestMail(id);
+      const updated = await sendTestMail(id);
       setData((prev) => ({
         ...prev,
         docs: prev.docs.map((r) =>
-          r._id === id ? { ...r, status: "sent" } : r,
+          r._id === id ? { ...r, status: updated?.status || "sent" } : r,
         ),
       }));
       alert("Correo enviado");

@@ -141,7 +141,7 @@ export async function generatePDF(id) {
 export async function sendTestMail(reportId) {
   try {
     const res = await api.get(`/reports/mail/test/${reportId}`);
-    return res.data;
+    return res.data.payload;
   } catch (e) {
     console.error(e.response?.data ?? e.message ?? e);
     throw e;

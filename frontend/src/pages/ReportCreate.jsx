@@ -115,7 +115,7 @@ export default function ReportCreate() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const payload = cleanPayload(data);
+      const payload = cleanPayload({ ...data, status: "entered" });
       await postReport(payload);
       setTimeout(() => {
         navigate("/?view=reports");
@@ -152,17 +152,9 @@ export default function ReportCreate() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
-              <select
-                {...register("status")}
-                id="status"
-                className="border p-2 rounded"
-              >
-                <option value="entered">Ingresado</option>
-                <option value="started">En curso</option>
-                <option value="finished">Finalizado</option>
-                <option value="sent">Enviado</option>
-                <option value="cancelled">Cancelado</option>
-              </select>
+              <div id="status" className="rounded border border-[#dce0e5] bg-[#f8fafb] px-3 py-2 text-sm text-[#4b5563]">
+                Ingresado
+              </div>
             </div>
 
             <div>

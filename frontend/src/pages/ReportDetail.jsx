@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportByNumber, getReportDueDate, updateReport, destroyReport, finishReport } from "../services/reports";
+import { getReportByNumber, getReportDueDate, updateReport, finishReport } from "../services/reports";
 import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
@@ -16,6 +16,7 @@ export default function ReportDetail() {
   const { n } = useParams();
   const [reportId, setReportId] = useState(null);
   const [reportImages, setReportImages] = useState([]);
+  const [reportStatus, setReportStatus] = useState("entered");
   const [clients, setClients] = useState([]);
   const [clientVeterinarians, setClientVeterinarians] = useState([]);
   const [dueDate, setDueDate] = useState(null);
@@ -28,6 +29,7 @@ export default function ReportDetail() {
       .then((data) => {
         setReportId(data._id);
         setReportImages(data.images || []);
+        setReportStatus(data.status || "entered");
         reset({
           protocolNumber: data.protocolNumber,
           status: data.status,
@@ -94,6 +96,8 @@ export default function ReportDetail() {
       });
   }, [selectedClient]);
 
+  const isFinished = reportStatus === "finished";
+
   const maybeAddVeterinarianToClient = async (data) => {
     const veterinarian = data.veterinarian?.trim();
     if (!data.client || !veterinarian) return;
@@ -117,7 +121,9 @@ export default function ReportDetail() {
   const onSubmit = async (formData) => {
     try {
       const payload = cleanPayload(formData);
-      await updateReport(reportId, payload);
+      const updated = await updateReport(reportId, payload);
+      setReportStatus(updated?.status || (reportStatus === "entered" ? "started" : reportStatus));
+      setValue("status", updated?.status || (reportStatus === "entered" ? "started" : reportStatus), { shouldDirty: true });
       alert("Informe actualizado!");
       navigate("/?view=reports");
     } catch (err) {
@@ -126,15 +132,17 @@ export default function ReportDetail() {
     }
   };
 
-  const onDeleteReport = async () => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este informe?")) {
+  const onCancelReport = async () => {
+    if (window.confirm("¿Estás seguro de que quieres cancelar este informe?")) {
       try {
-        await destroyReport(reportId);
-        alert("Informe eliminado");
+        const updated = await updateReport(reportId, { status: "cancelled" });
+        setReportStatus(updated?.status || "cancelled");
+        setValue("status", updated?.status || "cancelled", { shouldDirty: true });
+        alert("Informe cancelado");
         navigate("/?view=reports");
       } catch (err) {
         console.error(err);
-        alert("Error al eliminar");
+        alert("Error al cancelar");
       }
     }
   };
@@ -148,7 +156,7 @@ export default function ReportDetail() {
       if (!formValues.entryDate) missing.push("Fecha de Entrada");
       if (!formValues.client) missing.push("Cliente");
       if (!formValues.studyType) missing.push("Tipo de Estudio");
-      if (!formValues.sampleInfo.trim()) missing.push("Muestra Remitida");
+      if (!formValues.sampleInfo?.trim()) missing.push("Muestra Remitida");
       if (!formValues.microDescription?.trim()) missing.push("Descripción Microscópica");
       if (!formValues.result?.trim()) missing.push("Diagnóstico");
 
@@ -157,9 +165,17 @@ export default function ReportDetail() {
         return;
       }
 
-      const updated = await finishReport(reportId);
-      alert("Informe finalizado correctamente");
-      setValue("status", updated.status, { shouldDirty: true });
+      if (reportStatus === "finished") {
+        const updated = await updateReport(reportId, { status: "started" });
+        setReportStatus(updated?.status || "started");
+        setValue("status", updated?.status || "started", { shouldDirty: true });
+        alert("Informe reabierto correctamente");
+      } else {
+        const updated = await finishReport(reportId);
+        setReportStatus(updated?.status || "finished");
+        setValue("status", updated?.status || "finished", { shouldDirty: true });
+        alert("Informe finalizado correctamente");
+      }
       navigate("/?view=reports");
     } catch (err) {
       console.error(err);
@@ -182,18 +198,14 @@ export default function ReportDetail() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="protocolNumber">Nro. de Protocolo</label>
-              <input {...register("protocolNumber")} id="protocolNumber" className="border p-2 rounded" />
+              <input {...register("protocolNumber")} id="protocolNumber" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
-              <select {...register("status")} id="status" className="border p-2 rounded">
-                <option value="entered">Ingresado</option>
-                <option value="started">En curso</option>
-                <option value="finished">Finalizado</option>
-                <option value="sent">Enviado</option>
-                <option value="cancelled">Cancelado</option>
-              </select>
+              <div id="status" className="rounded border border-[#dce0e5] bg-[#f8fafb] px-3 py-2 text-sm text-[#4b5563]">
+                {reportStatus === "finished" ? "Finalizado" : reportStatus === "cancelled" ? "Cancelado" : reportStatus === "sent" ? "Enviado" : reportStatus === "started" ? "En curso" : "Ingresado"}
+              </div>
             </div>
 
             <div>
@@ -202,7 +214,8 @@ export default function ReportDetail() {
                 type="date"
                 {...register("entryDate", { required: "La fecha de entrada es obligatoria" })}
                 id="entryDate"
-                className="border p-2 rounded"
+                className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`}
+                disabled={isFinished}
               />
               {dueDate && (
                 <p className="text-sm text-gray-400 mt-1">
@@ -224,6 +237,7 @@ export default function ReportDetail() {
                   setValue("client", clientId, { shouldDirty: true });
                 }}
                 error={errors.client?.message}
+                disabled={isFinished}
               />
             </div>
 
@@ -235,13 +249,13 @@ export default function ReportDetail() {
                 onChange={(veterinarian) => setValue("veterinarian", veterinarian, { shouldDirty: true })}
                 onAdd={(inputValue) => maybeAddVeterinarianToClient({ client: selectedClient, veterinarian: inputValue })}
                 error={errors.veterinarian?.message}
-                disabled={!selectedClient}
+                disabled={!selectedClient || isFinished}
               />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="studyType">Tipo de Estudio</label>
-              <select {...register("studyType")} className="border p-2 rounded">
+              <select {...register("studyType")} className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished}>
                 <option value="cito">Citología</option>
                 <option value="hp">Histopatología</option>
                 <option value="ihq">Inmunohistoquímica</option>
@@ -252,17 +266,17 @@ export default function ReportDetail() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="owner">Propietario/a</label>
-              <input {...register("patient.owner")} id="owner" className="border p-2 rounded" />
+              <input {...register("patient.owner")} id="owner" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="name">Nombre</label>
-              <input {...register("patient.name")} className="border p-2 rounded" />
+              <input {...register("patient.name")} className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="species">Especie</label>
-              <select {...register("patient.species")} id="species" className="border p-2 rounded" defaultValue="">
+              <select {...register("patient.species")} id="species" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} defaultValue="" disabled={isFinished}>
                 <option value="">Seleccione</option>
                 <option value="canine">Canino</option>
                 <option value="feline">Felino</option>
@@ -275,17 +289,17 @@ export default function ReportDetail() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="breed">Raza</label>
-              <input {...register("patient.breed")} id="breed" className="border p-2 rounded" />
+              <input {...register("patient.breed")} id="breed" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="age">Edad</label>
-              <input {...register("patient.age")} id="age" className="border p-2 rounded" />
+              <input {...register("patient.age")} id="age" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="sex">Sexo</label>
-              <select {...register("patient.sex")} id="sex" className="border p-2 rounded">
+              <select {...register("patient.sex")} id="sex" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished}>
                 <option value="unknown">Desconocido</option>
                 <option value="macho">Macho</option>
                 <option value="hembra">Hembra</option>
@@ -296,8 +310,9 @@ export default function ReportDetail() {
               <label className="block mb-1 font-medium" htmlFor="neutered">Castrado</label>
               <select
                 id="neutered"
-                className="border p-2 rounded"
+                className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`}
                 {...register("patient.neutered")}
+                disabled={isFinished}
               >
                 <option value="unknown">Desconocido</option>
                 <option value="neutered">Sí</option>
@@ -307,7 +322,7 @@ export default function ReportDetail() {
 
             <div>
               <label className="block mb-1 font-medium" htmlFor="color">Color</label>
-              <input {...register("patient.color")} id="color" className="border p-2 rounded" />
+              <input {...register("patient.color")} id="color" className={`border p-2 rounded ${isFinished ? "report-finished-field" : ""}`} disabled={isFinished} />
             </div>
 
             <h2 className="text-2xl font-bold mt-4 col-span-2">Resultados</h2>
@@ -318,7 +333,8 @@ export default function ReportDetail() {
                 onKeyDown={(e) => e.stopPropagation()}
                 {...register("sampleInfo")}
                 id="sampleInfo"
-                className="border p-2 rounded w-full"
+                className={`border p-2 rounded w-full ${isFinished ? "report-finished-field" : ""}`}
+                disabled={isFinished}
               />
             </div>
 
@@ -328,7 +344,8 @@ export default function ReportDetail() {
                 onKeyDown={(e) => e.stopPropagation()}
                 {...register("macroDescription")}
                 id="macroDescription"
-                className="border p-2 rounded w-full min-h-[100px]"
+                className={`border p-2 rounded w-full min-h-[100px] ${isFinished ? "report-finished-field" : ""}`}
+                disabled={isFinished}
               />
             </div>
 
@@ -338,7 +355,8 @@ export default function ReportDetail() {
                 onKeyDown={(e) => e.stopPropagation()}
                 {...register("microDescription")}
                 id="microDescription"
-                className="border p-2 rounded w-full min-h-[100px]"
+                className={`border p-2 rounded w-full min-h-[100px] ${isFinished ? "report-finished-field" : ""}`}
+                disabled={isFinished}
               />
             </div>
 
@@ -348,7 +366,8 @@ export default function ReportDetail() {
                 onKeyDown={(e) => e.stopPropagation()}
                 {...register("comments")}
                 id="comments" 
-                className="border p-2 rounded w-full" 
+                className={`border p-2 rounded w-full ${isFinished ? "report-finished-field" : ""}`} 
+                disabled={isFinished}
               />
             </div>
 
@@ -358,7 +377,8 @@ export default function ReportDetail() {
                 onKeyDown={(e) => e.stopPropagation()}
                 {...register("result")} 
                 id="result" 
-                className="border p-2 rounded w-full" 
+                className={`border p-2 rounded w-full ${isFinished ? "report-finished-field" : ""}`} 
+                disabled={isFinished}
               />
             </div>
 
@@ -367,26 +387,30 @@ export default function ReportDetail() {
                 reportId={reportId}
                 images={reportImages}
                 onImagesChange={setReportImages}
+                disabled={isFinished}
               />
             ) : null}
 
             <div className="flex flex-wrap justify-around gap-3 col-span-2">
-              <button type="submit" className="bg-[#632b91] text-white px-16 py-2 rounded-lg transition font-bold link-button">
-                Guardar Informe
-              </button>
+              {!isFinished ? (
+                <button type="submit" className="bg-[#632b91] text-white px-16 py-2 rounded-lg transition font-bold link-button">
+                  Guardar Informe
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="rounded-lg border border-[#0b8457] bg-transparent px-4 py-2 font-semibold text-[#0b8457] transition-colors hover:bg-[#0b8457] hover:text-white"
                 onClick={onFinishReport}
               >
-                Finalizar Informe
+                {reportStatus === "finished" ? "Reabrir Informe" : "Finalizar Informe"}
               </button>
               <button
                 type="button"
                 className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
-                onClick={onDeleteReport}
+                onClick={onCancelReport}
+                disabled={reportStatus === "cancelled"}
               >
-                Eliminar Informe
+                {reportStatus === "cancelled" ? "Informe cancelado" : "Cancelar Informe"}
               </button>
             </div>
 

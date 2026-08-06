@@ -145,31 +145,31 @@ export async function SENDReportByEmail(req, res, next) {
       return res.status(400).json({ message: "Missing report id" });
     }
 
-    // 1. Generar PDF en memoria
     const pdfBuffer = await reportsServices.generateReport(id);
 
     if (!pdfBuffer) {
       return res.status(404).json({ message: "Report not found or PDF could not be generated" });
     }
 
-    // 2. Obtener datos del report (para email destino)
     const report = await reportsServices.getReportById(id);
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    // 3. Enviar mail
+    if (report.status !== 'finished') {
+      return res.status(400).json({ success: false, message: 'Only finished reports can be sent' });
+    }
+
     await mailServices.sendReportEmail({
       to: report.client.email,
       reportNumber: report.protocolNumber,
       pdfBuffer,
     });
 
-    // 4. (opcional) actualizar estado
-    // await reportsServices.updateReportStatus(id, "sent");
+    const updated = await reportsServices.updateReport(id, { status: 'sent' });
 
-    return res.status(200).json({ message: "Report sent successfully" });
+    return res.status(200).json({ success: true, payload: updated });
   } catch (e) {
     next(e);
   }

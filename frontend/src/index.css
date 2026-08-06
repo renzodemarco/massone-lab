@@ -30,6 +30,19 @@ body {
   min-height: 100vh;
 }
 
+.report-finished-field {
+  background-color: #fcfbff;
+  color: #5f556e;
+  border-color: #d8cfe7;
+}
+
+.report-finished-field:disabled {
+  background-color: #fcfbff;
+  color: #5f556e;
+  border-color: #d8cfe7;
+  opacity: 1;
+}
+
 h1 {
   color: var(--color-text);
 }
