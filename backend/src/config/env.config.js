@@ -8,6 +8,7 @@ export default {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT,
     JWT_SECRET: process.env.JWT_SECRET,
+    NODE_ENV: process.env.NODE_ENV || "development",
     FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
