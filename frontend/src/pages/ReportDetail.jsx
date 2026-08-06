@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportByNumber, getReportDueDate, updateReport, destroyReport } from "../services/reports";
+import { getReportByNumber, getReportDueDate, updateReport, destroyReport, finishReport } from "../services/reports";
 import { addVeterinarianToClient, getClientById, getClients } from "../services/clients";
 import Sidebar from "../sections/Sidebar";
 import FormError from "../components/FormError";
@@ -139,6 +139,34 @@ export default function ReportDetail() {
     }
   };
 
+  const onFinishReport = async () => {
+    try {
+      const formValues = watch();
+      const missing = [];
+
+      if (!formValues.protocolNumber?.trim()) missing.push("Nro. de Protocolo");
+      if (!formValues.entryDate) missing.push("Fecha de Entrada");
+      if (!formValues.client) missing.push("Cliente");
+      if (!formValues.studyType) missing.push("Tipo de Estudio");
+      if (!formValues.sampleInfo.trim()) missing.push("Muestra Remitida");
+      if (!formValues.microDescription?.trim()) missing.push("Descripción Microscópica");
+      if (!formValues.result?.trim()) missing.push("Diagnóstico");
+
+      if (missing.length) {
+        alert(`No se puede finalizar el informe. Faltan: ${missing.join(", ")}`);
+        return;
+      }
+
+      const updated = await finishReport(reportId);
+      alert("Informe finalizado correctamente");
+      setValue("status", updated.status, { shouldDirty: true });
+      navigate("/?view=reports");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error al finalizar el informe");
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#faf9f6]">
       <Sidebar back={true} />
@@ -161,7 +189,7 @@ export default function ReportDetail() {
               <label className="block mb-1 font-medium" htmlFor="status">Estado</label>
               <select {...register("status")} id="status" className="border p-2 rounded">
                 <option value="entered">Ingresado</option>
-                <option value="started">Iniciado</option>
+                <option value="started">En curso</option>
                 <option value="finished">Finalizado</option>
                 <option value="sent">Enviado</option>
                 <option value="cancelled">Cancelado</option>
@@ -342,11 +370,18 @@ export default function ReportDetail() {
               />
             ) : null}
 
-            <div className="flex justify-around col-span-2">
-              <button type="submit" className="bg-[#632b91] text-white px-20 py-2 rounded-lg transition font-bold link-button">
+            <div className="flex flex-wrap justify-around gap-3 col-span-2">
+              <button type="submit" className="bg-[#632b91] text-white px-16 py-2 rounded-lg transition font-bold link-button">
                 Guardar Informe
               </button>
-                            <button
+              <button
+                type="button"
+                className="rounded-lg border border-[#0b8457] bg-transparent px-4 py-2 font-semibold text-[#0b8457] transition-colors hover:bg-[#0b8457] hover:text-white"
+                onClick={onFinishReport}
+              >
+                Finalizar Informe
+              </button>
+              <button
                 type="button"
                 className="rounded-lg border border-[#99144d] bg-transparent px-4 py-2 font-semibold text-[#99144d] transition-colors hover:bg-[#99144d] hover:text-white opacity-60 hover:opacity-90 transition-opacity"
                 onClick={onDeleteReport}

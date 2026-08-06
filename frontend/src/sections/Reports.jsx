@@ -69,7 +69,7 @@ function Reports() {
           >
             <option value="">Todos los estados</option>
             <option value="entered">Ingresado</option>
-            <option value="started">Iniciado</option>
+            <option value="started">En curso</option>
             <option value="finished">Finalizado</option>
             <option value="sent">Enviado</option>
             <option value="cancelled">Cancelado</option>

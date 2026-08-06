@@ -147,3 +147,13 @@ export async function sendTestMail(reportId) {
     throw e;
   }
 }
+
+export async function finishReport(id) {
+  try {
+    const res = await api.post(`/reports/finish/${id}`);
+    return res.data.payload;
+  } catch (e) {
+    console.error(e.response?.data ?? e.message ?? e);
+    throw e;
+  }
+}

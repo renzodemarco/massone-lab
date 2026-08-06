@@ -12,7 +12,7 @@ export default function ReportsTable({ searchParams }) {
   const statusLabel = (status) => {
     const map = {
       entered: "Ingresado",
-      started: "Iniciado",
+      started: "En curso",
       finished: "Finalizado",
       sent: "Enviado",
       cancelled: "Cancelado",

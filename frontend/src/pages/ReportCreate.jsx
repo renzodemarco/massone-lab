@@ -158,7 +158,7 @@ export default function ReportCreate() {
                 className="border p-2 rounded"
               >
                 <option value="entered">Ingresado</option>
-                <option value="started">Iniciado</option>
+                <option value="started">En curso</option>
                 <option value="finished">Finalizado</option>
                 <option value="sent">Enviado</option>
                 <option value="cancelled">Cancelado</option>
